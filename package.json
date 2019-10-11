@@ -14,5 +14,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Fabian Mu",
-  "license": "ISC"
+  "license": "ISC",
+  "scripts": {
+	    "start": "node index.js",
+	      "build": "webpack"
+  }
 }
