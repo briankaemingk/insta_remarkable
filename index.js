@@ -3,7 +3,18 @@ const request = require('request')
 const fs = require('fs')
 const slugify = require('slugify')
 const exec = require('child_process').exec
+var express = require('express');
 require('dotenv').config()
+
+var port = process.env.PORT || 3000;
+var app = express();
+app.get('/', function (req, res) {
+    console.log(`Called from web`);
+    instapaper_to_pdf();
+});
+app.listen(port, function () {
+    console.log(`Example app listening on port !`);
+});
 
 function os_func() {
     this.execCommand = function(cmd, callback) {
@@ -40,62 +51,69 @@ var instapaperCookies = [
 ]
 
 // Promise interface
-scrapeIt({
-    url: "https://www.instapaper.com/u"
-    , headers: { Cookie: `pfp=${process.env.INSTAPAPER_PFP}; pfu=${process.env.INSTAPAPER_PFU}; pfh=${process.env.INSTAPAPER_PFH}` }
-}, {
-    articles: {
-        listItem: ".article_inner_item",
-        data: {
-            title: "a.article_title",
-            url: {
-                selector: "a.article_title",
-                attr: "href"
+function instapaper_to_pdf() {
+    scrapeIt({
+        url: "https://www.instapaper.com/u"
+        ,
+        headers: {Cookie: `pfp=${process.env.INSTAPAPER_PFP}; pfu=${process.env.INSTAPAPER_PFU}; pfh=${process.env.INSTAPAPER_PFH}`}
+    }, {
+        articles: {
+            listItem: ".article_inner_item",
+            data: {
+                title: "a.article_title",
+                url: {
+                    selector: "a.article_title",
+                    attr: "href"
+                }
             }
         }
-    }
-}).then(page => {
-    console.log(page.articles)
+    }).then(page => {
+        console.log(page.articles)
 
-    page.articles.forEach(function (article) {
-        // console.log(`https://www.instapaper.com${article.url}`)
-        const slugRemove = /[$*_+~.,/()'"!\-:@]/g
-        filename = `./pdfs/${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`
-        if (!fs.existsSync(filename)) {
-            var r = request({
-                url: 'https://pdf.cool/generate',
-                method: 'POST',
-                headers: {
-                    authorization: `Bearer ${token}`
-                },
-                crossOrigin: true,
-                json: true,
-                body: {
-                    url: `https://www.instapaper.com${article.url}`,
-                    cookies: instapaperCookies,
-                    "format": "A4",
-                    "margin": {
-                        "top": "24px",
-                        "right": "16px",
-                        "bottom": "24px",
-                        "left": "24px"
+        page.articles.forEach(function (article) {
+            // console.log(`https://www.instapaper.com${article.url}`)
+            const slugRemove = /[$*_+~.,/()'"!\-:@]/g
+            filename = `./pdfs/${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`
+            if (!fs.existsSync(filename)) {
+                var r = request({
+                    url: 'https://pdf.cool/generate',
+                    method: 'POST',
+                    headers: {
+                        authorization: `Bearer ${token}`
                     },
-                    // css: 'body{font-family: !initial important;}'
-                    wait: 'load' // instapaper assets are slow... we don't want blank pdfs
-                }
-            }).on('response', function (response) {
-                // console.log(response)
-                if (response['headers']['content-disposition']) {
-                    filename = `./pdfs/${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`
-                    r.pipe(fs.createWriteStream(filename));
-                    console.log(`stored ${filename}`)
-                    os.execCommand(`./rmapi put ${filename} /Instapaper`, function (returnvalue) {
-                        console.log(`uploaded ${filename} to /Instapaper`)
-                    });
-                }
-            })
-        } else {
-            console.log(`exists: ${filename}`)
-        }
+                    crossOrigin: true,
+                    json: true,
+                    body: {
+                        url: `https://www.instapaper.com${article.url}`,
+                        cookies: instapaperCookies,
+                        "format": "A4",
+                        "margin": {
+                            "top": "24px",
+                            "right": "16px",
+                            "bottom": "24px",
+                            "left": "24px"
+                        },
+                        // css: 'body{font-family: !initial important;}'
+                        wait: 'load' // instapaper assets are slow... we don't want blank pdfs
+                    }
+                }).on('response', function (response) {
+                    // console.log(response)
+                    if (response['headers']['content-disposition']) {
+                        filename = `./pdfs/${slugify(article.title, {
+                            replacement: '-',
+                            remove: slugRemove,
+                            lower: true
+                        })}.pdf`
+                        r.pipe(fs.createWriteStream(filename));
+                        console.log(`stored ${filename}`)
+                        os.execCommand(`./rmapi put ${filename} /Instapaper`, function (returnvalue) {
+                            console.log(`uploaded ${filename} to /Instapaper`)
+                        });
+                    }
+                })
+            } else {
+                console.log(`exists: ${filename}`)
+            }
+        })
     })
-})
+}
