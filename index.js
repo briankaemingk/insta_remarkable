@@ -11,7 +11,7 @@ var app = express();
 app.get('/', function (req, res) {
     console.log(`Called from web`);
     instapaper_to_pdf();
-    res.send('Hello World!')
+    res.send('Complete')
 });
 app.listen(port, function () {
     console.log(`Example app listening on port !`);
