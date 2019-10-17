@@ -8,7 +8,8 @@
     "express": "^4.17.1",
     "request": "^2.83.0",
     "scrape-it": "^4.1.0",
-    "slugify": "^1.2.7"
+    "slugify": "^1.2.7",
+    "wkhtmltopdf": "^0.3.4"
   },
   "devDependencies": {},
   "scripts": {

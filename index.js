@@ -4,6 +4,8 @@ const fs = require('fs')
 const slugify = require('slugify')
 const exec = require('child_process').exec
 var express = require('express');
+var wkhtmltopdf = require('wkhtmltopdf');
+
 require('dotenv').config()
 
 var port = process.env.PORT || 3000;
@@ -14,7 +16,7 @@ app.get('/', function (req, res) {
     res.send('Complete')
 });
 app.listen(port, function () {
-    console.log(`Example app listening on port !`);
+    console.log(`App listening`);
 });
 
 function os_func() {
@@ -72,46 +74,23 @@ function instapaper_to_pdf() {
         console.log(page.articles)
 
         page.articles.forEach(function (article) {
-            // console.log(`https://www.instapaper.com${article.url}`)
-            const slugRemove = /[$*_+~.,/()'"!\-:@]/g
+            console.log(`https://www.instapaper.com${article.url}`);
+            const slugRemove = /[$*_+~.,/()'"!\-:@]/g;
             filename = `./pdfs/${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`
             if (!fs.existsSync(filename)) {
-                var r = request({
-                    url: 'https://pdf.cool/generate',
-                    method: 'POST',
-                    headers: {
-                        authorization: `Bearer ${token}`
-                    },
-                    crossOrigin: true,
-                    json: true,
-                    body: {
-                        url: `https://www.instapaper.com${article.url}`,
-                        cookies: instapaperCookies,
-                        "format": "A4",
-                        "margin": {
-                            "top": "24px",
-                            "right": "16px",
-                            "bottom": "24px",
-                            "left": "24px"
-                        },
-                        // css: 'body{font-family: !initial important;}'
-                        wait: 'load' // instapaper assets are slow... we don't want blank pdfs
-                    }
-                }).on('response', function (response) {
-                    // console.log(response)
-                    if (response['headers']['content-disposition']) {
-                        filename = `./pdfs/${slugify(article.title, {
-                            replacement: '-',
-                            remove: slugRemove,
-                            lower: true
-                        })}.pdf`
-                        r.pipe(fs.createWriteStream(filename));
-                        console.log(`stored ${filename}`)
+
+                wkhtmltopdf(`https://www.instapaper.com${article.url}`, { cookie: [
+                        [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
+                    ]
+                }, function (err, stream) {
+                    stream.pipe(fs.createWriteStream(filename));
+                    stream.on('end', function () {
+                        console.log(`stored ${filename}`);
                         os.execCommand(`./rmapi put ${filename} /Instapaper`, function (returnvalue) {
                             console.log(`uploaded ${filename} to /Instapaper`)
                         });
-                    }
-                })
+                    });
+                });
             } else {
                 console.log(`exists: ${filename}`)
             }
