@@ -80,29 +80,36 @@ function instapaper_to_pdf() {
             console.log(filename);
             if (!fs.existsSync(filename)) {
 
-                wkhtmltopdf(`https://www.instapaper.com${article.url}`, { cookie: [
+                wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filename}`, cookie: [
                             [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
                         ]
-                    }).pipe(fs.createWriteStream(filename));
-                wait: 'load'; // instapaper assets are slow... we don't want blank pdfs
-                console.log(`stored ${filename}`);
+                    });
+                wait: 'load' // instapaper assets are slow... we don't want blank pdfs
+
                 os.execCommand(`./rmapi put ${filename} /Instapaper`,function (returnvalue) {
                     console.log(`uploaded to /Instapaper`)
                 });
 
-                // wkhtmltopdf(`https://www.instapaper.com${article.url}`, { cookie: [
-                //         [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
-                //     ]
-                // }, function (err, stream) {
+
+                // wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filename}`, cookie: [
+                //             [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
+                //         ]
+                //     }).pipe(fs.createWriteStream(filename)).on('finish', function () {
                 //
-                //     stream.pipe(fs.createWriteStream(filename));
-                    // stream.on('end', function () {
-                    //     console.log(`stored ${filename}`);
-                    //     os.execCommand(`./rmapi put ${filename} /Instapaper`, function (returnvalue) {
-                    //         console.log(`uploaded ${filename} to /Instapaper`)
-                    //     });
-                    // });
-            //    });
+                // console.log(`stored`);
+                // os.execCommand(`./rmapi put ${filename} /Instapaper`,function (returnvalue) {
+                //     console.log(`uploaded to /Instapaper`)
+                // });
+
+               //  wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filename}`, cookie: [
+               //          [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
+               //      ]
+               //  }, function (err, stream) {
+               //          console.log(`stored ${filename}`);
+               //          os.execCommand(`./rmapi put ${filename} /Instapaper`, function (returnvalue) {
+               //              console.log(`uploaded ${filename} to /Instapaper`)
+               //          });
+               // });
             } else {
                 console.log(`exists: ${filename}`)
             }
