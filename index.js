@@ -84,12 +84,11 @@ function instapaper_to_pdf() {
                             [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
                         ]
                     }).pipe(fs.createWriteStream(filename));
-
-
-                    console.log(`stored ${filename}`);
-                    os.execCommand(`./rmapi put ${filename} /Instapaper`,function (returnvalue) {
-                                console.log(`uploaded to /Instapaper`)
-                            });
+                wait: 'load'; // instapaper assets are slow... we don't want blank pdfs
+                console.log(`stored ${filename}`);
+                os.execCommand(`./rmapi put ${filename} /Instapaper`,function (returnvalue) {
+                    console.log(`uploaded to /Instapaper`)
+                });
 
                 // wkhtmltopdf(`https://www.instapaper.com${article.url}`, { cookie: [
                 //         [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
