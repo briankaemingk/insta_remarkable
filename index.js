@@ -84,7 +84,6 @@ function instapaper_to_pdf() {
                     ]
                 }, function (err, stream) {
 
-                    wait: 'load'; // instapaper assets are slow... we don't want blank pdfs
                     stream.pipe(fs.createWriteStream(filename));
                     stream.on('end', function () {
                         console.log(`stored ${filename}`);
