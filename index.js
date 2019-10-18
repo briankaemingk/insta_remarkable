@@ -27,7 +27,7 @@ var os = new os_func();
 app.get('/', function (req, res) {
     console.log(`Called from web`);
     instapaper_to_pdf(function(){
-        const pdfFolder = './pdfs/';
+        const pdfFolder = '/app/pdfs/';
         fs.readdir(pdfFolder, (err, files) => {
             if (files !== null ) {
                 files.forEach(file => {
