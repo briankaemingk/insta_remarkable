@@ -10,15 +10,6 @@ require('dotenv').config()
 
 var port = process.env.PORT || 3000;
 var app = express();
-app.get('/', function (req, res) {
-    console.log(`Called from web`);
-    instapaper_to_pdf();
-    res.send('Complete')
-});
-app.listen(port, function () {
-    console.log(`App listening`);
-});
-
 function os_func() {
     this.execCommand = function(cmd, callback) {
         exec(cmd, (error, stdout, stderr) => {
@@ -32,6 +23,25 @@ function os_func() {
     }
 }
 var os = new os_func();
+
+app.get('/', function (req, res) {
+    console.log(`Called from web`);
+    instapaper_to_pdf(function(){
+        const pdfFolder = './pdfs/';
+        fs.readdir(pdfFolder, (err, files) => {
+            files.forEach(file => {
+                os.execCommand(`./rmapi put ${pdfFolder}/${file} /Instapaper`, function (returnvalue) {
+                    console.log(`uploaded ${file} to /Instapaper`)
+                    });
+            });
+        })
+        });
+    res.send('Complete')
+});
+app.listen(port, function () {
+    console.log(`App listening`);
+});
+
 
 var token = process.env.PDF_COOL_TOKEN
 
@@ -54,7 +64,7 @@ var instapaperCookies = [
 ]
 
 // Promise interface
-function instapaper_to_pdf() {
+function instapaper_to_pdf(callback) {
     scrapeIt({
         url: "https://www.instapaper.com/u"
         ,
@@ -82,13 +92,9 @@ function instapaper_to_pdf() {
 
                 wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filename}`, cookie: [
                             [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
-                        ]
-                    });
-                wait: 'load' // instapaper assets are slow... we don't want blank pdfs
-
-                os.execCommand(`./rmapi put ${filename} /Instapaper`,function (returnvalue) {
-                    console.log(`uploaded to /Instapaper`)
-                });
+                        ],
+                    javascriptDelay: 1000
+                })
 
 
                 // wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filename}`, cookie: [
@@ -101,7 +107,7 @@ function instapaper_to_pdf() {
                 //     console.log(`uploaded to /Instapaper`)
                 // });
 
-               //  wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filename}`, cookie: [
+               //  wkhtmltopdf(`https://www.instapaper.com${article.url}`, { cookie: [
                //          [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
                //      ]
                //  }, function (err, stream) {
@@ -109,10 +115,12 @@ function instapaper_to_pdf() {
                //          os.execCommand(`./rmapi put ${filename} /Instapaper`, function (returnvalue) {
                //              console.log(`uploaded ${filename} to /Instapaper`)
                //          });
-               // });
+               //         });
+                    
             } else {
                 console.log(`exists: ${filename}`)
             }
         })
-    })
+    });
+    callback();
 }
