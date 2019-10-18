@@ -27,7 +27,7 @@ var os = new os_func();
 app.get('/', function (req, res) {
     console.log(`Called from web`);
     instapaper_to_pdf();
-    res.send('<iframe src="https://docs.google.com/document/d/e/2PACX-1vQrtFxmBvHkRcHVp5wPpw47LVpjNao3cP9VX8c9fxR02-m0lHoEyKx5gvQOoRLI0YrYmw3n7p4qTx1j/pub?embedded=true"></iframe>')
+    res.send('Complete')
 });
 app.listen(port, function () {
     console.log(`App listening`);
