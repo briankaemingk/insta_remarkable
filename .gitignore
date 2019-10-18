@@ -3,4 +3,3 @@
 *.pdf
 package-lock.json
 *.idea
-/pdfs/*
