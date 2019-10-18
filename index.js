@@ -29,11 +29,13 @@ app.get('/', function (req, res) {
     instapaper_to_pdf(function(){
         const pdfFolder = './pdfs/';
         fs.readdir(pdfFolder, (err, files) => {
-            files.forEach(file => {
-                os.execCommand(`./rmapi put ${pdfFolder}/${file} /Instapaper`, function (returnvalue) {
-                    console.log(`uploaded ${file} to /Instapaper`)
+            if (files !== null ) {
+                files.forEach(file => {
+                    os.execCommand(`./rmapi put ${pdfFolder}/${file} /Instapaper`, function (returnvalue) {
+                        console.log(`uploaded ${file} to /Instapaper`)
                     });
-            });
+                });
+            }
         })
         });
     res.send('Complete')
