@@ -34,7 +34,6 @@ app.listen(port, function () {
 });
 
 
-var token = process.env.PDF_COOL_TOKEN
 
 var instapaperCookies = [
     {
