@@ -5,11 +5,51 @@ const slugify = require('slugify')
 const exec = require('child_process').exec
 var express = require('express');
 var wkhtmltopdf = require('wkhtmltopdf');
+const nodemailer = require('nodemailer');
+var AWS = require("aws-sdk");
+// Set the region
+AWS.config.update({region: 'REGION'});
+
+// Create S3 service object
+s3 = new AWS.S3({apiVersion: '2006-03-01'});
+
 
 require('dotenv').config()
 
+
+// const fn = 'contacts.csv';
+//
+// const uploadFile = () => {
+//     fs.readFile(fn, (err, data) => {
+//         if (err) throw err;
+//         const params = {
+//             Key: 'contacts.csv', // file will be saved as testBucket/contacts.csv
+//             Bucket: process.env.S3_BUCKET_NAME, // pass your bucket name
+//             Body: JSON.stringify(data, null, 2)
+//         };
+//         s3.upload(params, function(s3Err, data) {
+//             if (s3Err) throw s3Err
+//             console.log(`File uploaded successfully at ${data.Location}`)
+//         });
+//     });
+// };
+
+
+
+let transporter = nodemailer.createTransport({
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+
 var port = process.env.PORT || 3000;
 var app = express();
+
+
 function os_func() {
     this.execCommand = function(cmd, callback) {
         exec(cmd, (error, stdout, stderr) => {
@@ -23,6 +63,8 @@ function os_func() {
     }
 }
 var os = new os_func();
+
+
 
 app.get('/', function (req, res) {
     console.log(`Called from web`);
@@ -86,9 +128,54 @@ function instapaper_to_pdf() {
                 }).on('close', function (response){
                     filename = `./pdfs/${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
                     console.log(`stored ${filename}`);
-                    os.execCommand(`./rmapi put ${filename} /Instapaper`, function (returnvalue) {
-                        console.log(`uploaded to /Instapaper`)
+
+                    os.execCommand(`./rmapi put ${filename}`, function (returnvalue) {
+                        console.log(`uploaded to rM`)
                     });
+
+                    //STORE IN S3
+                    var uploadParams = {Bucket: process.env.S3_BUCKET_NAME, Key: '', Body: ''};
+                    var fileStream = fs.createReadStream(filename);
+                    fileStream.on('error', function(err) {
+                        console.log('File Error', err);
+                    });
+                    uploadParams.Body = fileStream;
+                    var path = require('path');
+                    uploadParams.Key = path.basename(filename);
+
+                    // call S3 to retrieve upload file to specified bucket
+                    s3.upload (uploadParams, function (err, data) {
+                        if (err) {
+                            console.log("Error", err);
+                        } if (data) {
+                            console.log("Upload Success", data.Location);
+                        }
+                    });
+
+                    //EMAIL TO KINDLE
+                    // const message = {
+                    //     from: 'brian.e.k@gmail.com',
+                    //     to: 'b1985e.k@kindle.com',
+                    //     subject: 'rM upgrade sending pdf',
+                    //     attachments: [
+                    //         { // Use a URL as an attachment
+                    //             filename: `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`,
+                    //             path: `https://www.instapaper.com${article.url}`
+                    //         }
+                    //     ]
+                    // };
+
+                    // transporter.sendMail(message, (error, info) => {
+                    //     if (error) {
+                    //         console.log(error);
+                    //         console.log(error)
+                    //         res.status(400).send({success: false})
+                    //     } else {
+                    //         console.log('sent email')
+                    //         res.status(200).send({success: true});
+                    //     }
+                    // });
+
                 });
                     
             } else {
