@@ -114,7 +114,7 @@ function instapaper_to_pdf() {
                     var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filepath}`, cookie: [
                             [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
                         ],
-                        javascriptDelay: 1000
+                        javascriptDelay: 2000
                     }).on('close', function (response){
                         filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
                         filepath = `./pdfs/${filename}`;
