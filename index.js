@@ -138,29 +138,36 @@ function instapaper_to_pdf() {
                             } if (data) {
                                 console.log("Upload Success", data.Location);
 
-                                //EMAIL TO KINDLE
-                                // const message = {
-                                //     from: 'brian.e.k@gmail.com',
-                                //     to: 'b1985e.k@kindle.com',
-                                //     subject: 'rM upgrade sending pdf',
-                                //     attachments: [
-                                //         { // Use a URL as an attachment
-                                //             filename: `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`,
-                                //             path: `https://www.instapaper.com${article.url}`
-                                //         }
-                                //     ]
-                                // };
+                                filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
+                                filepath = `./pdfs/${filename}`;
 
-                                // transporter.sendMail(message, (error, info) => {
-                                //     if (error) {
-                                //         console.log(error);
-                                //         console.log(error)
-                                //         res.status(400).send({success: false})
-                                //     } else {
-                                //         console.log('sent email')
-                                //         res.status(200).send({success: true});
-                                //     }
-                                // });
+                                //EMAIL TO KINDLE
+                                const message = {
+                                    from: 'brian.e.k@zohomail.com',
+                                    to: 'b1985e.k@kindle.com',
+                                    subject: 'rM upgrade sending pdf',
+                                    headers: {
+                                        'Content-Disposition':' attachment; filename=license.txt',
+                                        'Content-Type': 'multipart/mixed'
+                                    },
+                                    attachments: [
+                                        { // Use a URL as an attachment
+                                            filename: 'license.txt',
+                                            path: 'https://raw.github.com/nodemailer/nodemailer/master/LICENSE'
+                                        }
+                                    ]
+                                };
+
+                                transporter.sendMail(message, (error, info) => {
+                                    if (error) {
+                                        console.log(error);
+                                        console.log(error)
+                                        res.status(400).send({success: false})
+                                    } else {
+                                        console.log('sent email')
+                                        res.status(200).send({success: true});
+                                    }
+                                });
                             }
                         });
                     });
