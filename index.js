@@ -18,9 +18,8 @@ require('dotenv').config()
 
 
 let transporter = nodemailer.createTransport({
-    host: 'smtp.zoho.com',
-    port: 465,
-    secure: true,
+    host: 'smtp.gmail.com',
+    port: 587,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
@@ -143,25 +142,23 @@ function instapaper_to_pdf() {
 
                                 //EMAIL TO KINDLE
                                 const message = {
-                                    from: 'brian.e.k@zohomail.com',
+                                    from: 'brian.e.k@gmail.com',
                                     to: 'b1985e.k@kindle.com',
                                     subject: 'rM upgrade sending pdf',
-                                    headers: {
-                                        'Content-Disposition':' attachment; filename=license.txt',
-                                        'Content-Type': 'multipart/mixed'
-                                    },
+                                    // headers: {
+                                    //     'Content-Type': 'multipart/mixed'
+                                    // },
                                     attachments: [
-                                        { // Use a URL as an attachment
-                                            filename: 'license.txt',
-                                            path: 'https://raw.github.com/nodemailer/nodemailer/master/LICENSE'
-                                        }
+                                        {
+                                            path: filepath
+
+                            }
                                     ]
                                 };
 
                                 transporter.sendMail(message, (error, info) => {
                                     if (error) {
                                         console.log(error);
-                                        console.log(error)
                                         res.status(400).send({success: false})
                                     } else {
                                         console.log('sent email')
