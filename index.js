@@ -18,9 +18,8 @@ require('dotenv').config()
 
 
 let transporter = nodemailer.createTransport({
-    host: 'smtp.zoho.com',
-    port: 465,
-    secure: true,
+    host: 'mail.gmx.com',
+    port: 587,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
@@ -143,15 +142,16 @@ function instapaper_to_pdf() {
 
                                     //EMAIL TO KINDLE
                                 const message = {
-                                    from: 'brian.e.k@zohomail.com',
-                                    to: 'brian.e.k@zohomail.com',
-                                    subject: 'rM_send',
+                                    from: 'brian.e.k@gmx.com',
+                                    to: 'b1985e.k@kindle.com',
+                                    subject: 'convert rM_send',
                                     attachments: [
                                         {
                                             path: filepath
 
                             }
-                                    ]
+                                    ],
+                                    text: 'See attachment'
                                 };
 
                                 transporter.sendMail(message, (error, info) => {
