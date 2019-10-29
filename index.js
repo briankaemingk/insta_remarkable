@@ -18,8 +18,9 @@ require('dotenv').config()
 
 
 let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
@@ -137,17 +138,14 @@ function instapaper_to_pdf() {
                             } if (data) {
                                 console.log("Upload Success", data.Location);
 
-                                filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
-                                filepath = `./pdfs/${filename}`;
+                                // filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
+                                // filepath = `./pdfs/${filename}`;
 
-                                //EMAIL TO KINDLE
+                                    //EMAIL TO KINDLE
                                 const message = {
-                                    from: 'brian.e.k@gmail.com',
-                                    to: 'b1985e.k@kindle.com',
-                                    subject: 'rM upgrade sending pdf',
-                                    // headers: {
-                                    //     'Content-Type': 'multipart/mixed'
-                                    // },
+                                    from: 'brian.e.k@zohomail.com',
+                                    to: 'brian.e.k@zohomail.com',
+                                    subject: 'rM_send',
                                     attachments: [
                                         {
                                             path: filepath
