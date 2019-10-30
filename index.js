@@ -64,6 +64,26 @@ app.post('/send', function (req, res) {
     download(uri, filepath, function(){
         os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
             console.log(`${filepath} uploaded to rM`)
+            //EMAIL TO KINDLE
+            const message = {
+                from: 'brian.e.k@gmx.com',
+                to: 'b1985e.k@kindle.com',
+                subject: 'convert rM_send',
+                attachments: [
+                    { path: filepath }
+                ],
+                text: 'See attachment'
+            };
+            transporter.sendMail(message, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(400).send({success: false})
+                } else {
+                    console.log('sent email')
+                    res.status(200).send({success: true});
+                }
+            });
+
         });
     });
 
