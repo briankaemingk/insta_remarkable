@@ -53,6 +53,40 @@ app.get('/', function (req, res) {
     res.send('Complete')
 });
 
+app.post('/rm', function (req, res) {
+
+});
+
+app.post('/kindle', function (req, res) {
+    var uri = req.body.url;
+    var url = require("url");
+    var parsed = url.parse(uri);
+    var name = path.basename(parsed.pathname);
+    var filepath = `./pdfs/${name}`;
+    download(uri, filepath, function(){
+        //EMAIL TO KINDLE
+        const message = {
+                from: 'brian.e.k@gmx.com',
+                to: 'b1985e.k@kindle.com',
+                subject: 'convert rM_send #kindle',
+                attachments: [
+                    { path: filepath }
+                ],
+                text: 'See attachment'
+            };
+            transporter.sendMail(message, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(400).send({success: false})
+                } else {
+                    console.log('sent email')
+                    res.status(200).send({success: true});
+                }
+
+        });
+
+});
+
 app.post('/send', function (req, res) {
 
     console.log(`Called send from web`);
@@ -63,7 +97,7 @@ app.post('/send', function (req, res) {
     var filepath = `./pdfs/${name}`;
     download(uri, filepath, function(){
         os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-            console.log(`${filepath} uploaded to rM`)
+            console.log(`${filepath} uploaded to rM`);
             //EMAIL TO KINDLE
             const message = {
                 from: 'brian.e.k@gmx.com',
