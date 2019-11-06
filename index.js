@@ -77,7 +77,7 @@ app.post('/send', function (req, res) {
                 ],
                 text: 'See attachment'
             };
-            if (subject.indexOf("Rm") == -1) {
+            if (subject.toLowerCase().indexOf("rm") == -1) {
                 transporter.sendMail(message, (error, info) => {
                     if (error) {
                         console.log(error);
