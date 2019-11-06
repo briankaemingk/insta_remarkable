@@ -66,6 +66,7 @@ app.post('/send', function (req, res) {
     download(uri, filepath, function(){
         os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
             console.log(`${filepath} uploaded to rM`);
+            console.log(`Subject: ${subject}`);
             //EMAIL TO KINDLE
             const message = {
                 from: 'brian.e.k@gmx.com',
@@ -76,7 +77,7 @@ app.post('/send', function (req, res) {
                 ],
                 text: 'See attachment'
             };
-            if (!subject.includes("#rm")) {
+            if (subject.indexOf("#rm") == -1) {
                 transporter.sendMail(message, (error, info) => {
                     if (error) {
                         console.log(error);
