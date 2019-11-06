@@ -58,6 +58,7 @@ app.post('/send', function (req, res) {
 
     console.log(`Called send from web`);
     var uri = req.body.url;
+    var subject = req.body.subject;
     var url = require("url");
     var parsed = url.parse(uri);
     var name = path.basename(parsed.pathname);
@@ -75,16 +76,17 @@ app.post('/send', function (req, res) {
                 ],
                 text: 'See attachment'
             };
-            transporter.sendMail(message, (error, info) => {
-                if (error) {
-                    console.log(error);
-                    res.status(400).send({success: false})
-                } else {
-                    console.log('sent email')
-                    res.status(200).send({success: true});
-                }
-            });
-
+            if (!subject.includes("#rm")) {
+                transporter.sendMail(message, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                        res.status(400).send({success: false})
+                    } else {
+                        console.log('sent email')
+                        res.status(200).send({success: true});
+                    }
+                });
+            }
         });
     });
 
@@ -111,6 +113,25 @@ var instapaperCookies = [
     }
 ]
 
+
+var WSJCookies = [
+    {
+        name: 'gckp',
+        value: 'cx:1vji9186e1cam2pm5i2e3z0xkv:1iz1f0ygho2hw',
+        domain: '.cxense.com'
+    },
+    {
+        name: '_scid',
+        value: 'd88e10d1-13d4-42ce-9a6c-1e38a975b3ec',
+        domain: '.wsj.com'
+    },
+    {
+        name: 'djcs_auto',
+        value: 'M1571864624%2FBqVzsu9H8O%2FjurqXzvxyq1oy%2BcS7TiaoPkwwSMQPHSxaZFcFuKC36H9KHyEErKu0gO7yq8WQw3xoJBiTP5DadVnjbkRX0WNqqbxBVvSEMu7rNYGGLpS5NKI%2BHTJE9Ca7VI7Ip8gam3wPbaqBJY76sCwpmjRJgzDQWNbnT21BzBFg2OumrV15KjtzqdQz6M2YySVdzrPn0S5PiGcMAUTzL0tlUPzV4OUwXWaWtpIdBPZvwtK%2Fc%2BE%2BxckXajsuoXgDrwpMLgQPYT5IqXrTF2YKkezJ%2F0kjcWjuaNta1X9AnztljC4LqNQCj%2BI1cPgJOyJx8KErQmg%2BGKlHlATsd1Npsg%3D%3DG',
+        domain: '.wsj.com'
+    }
+]
+
 // Promise interface
 function instapaper_to_pdf() {
     scrapeIt({
@@ -126,6 +147,12 @@ function instapaper_to_pdf() {
                     selector: "a.article_title",
                     attr: "href"
                 }
+                // ,
+                // source_url: "a.js_bookmark_edit action_link bookmark_edit_link muted open_modal android_hide",
+                // s_url: {
+                //     selector: "a.js_bookmark_edit action_link bookmark_edit_link muted open_modal android_hide",
+                //     attr: "href"
+                // }
             }
         }
     }).then(page => {
