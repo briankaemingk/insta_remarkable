@@ -167,11 +167,11 @@ function instapaper_to_pdf() {
             filepath = `./pdfs/${filename}`;
 
             os.execCommand(`./rmapi find .`, function (returnvalue) {
-                if(!`${returnvalue}`.includes('file'))
+                file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                filename = `${file}.pdf`;
+                filepath = `./pdfs/${filename}`;
+                if(!returnvalue.includes(file))
                 {
-                    file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
-                    filename = `${file}.pdf`;
-                    filepath = `./pdfs/${filename}`;
                     console.log(`${file} isn't on rM device`);
                     var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filepath}`, cookie: [
                                         [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
@@ -184,7 +184,7 @@ function instapaper_to_pdf() {
 
                                     os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
                                         filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
-                                        console.log(`${filename} uploaded to rM`)
+                                        console.log(`${filename} uploaded to rM`);
                                         //EMAIL TO KINDLE
                                         const message = {
                                             from: 'brian.e.k@gmx.com',
