@@ -184,6 +184,7 @@ function instapaper_to_pdf() {
 
                                     os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
                                         filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
+                                        filepath = `./pdfs/${filename}`;
                                         console.log(`${filename} uploaded to rM`);
                                         //EMAIL TO KINDLE
                                         const message = {
