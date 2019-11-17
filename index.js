@@ -166,8 +166,8 @@ function instapaper_to_pdf() {
             filename = `${file}.pdf`;
             filepath = `./pdfs/${filename}`;
 
-            os.execCommand(`./rmapi find . ${file}`, function (returnvalue) {
-                if(!`${returnvalue}`.includes('/'))
+            os.execCommand(`./rmapi find .`, function (returnvalue) {
+                if(!`${returnvalue}`.includes('file'))
                 {
                     file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                     filename = `${file}.pdf`;
