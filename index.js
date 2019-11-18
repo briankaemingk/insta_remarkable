@@ -187,23 +187,30 @@ function instapaper_to_pdf() {
                                         filepath = `./pdfs/${filename}`;
                                         console.log(`${filename} uploaded to rM`);
                                         //EMAIL TO KINDLE
-                                        const message = {
-                                            from: 'brian.e.k@gmx.com',
-                                            to: 'b1985e.k@kindle.com',
-                                            subject: 'convert rM_send',
-                                            attachments: [
-                                                { path: filepath }
+
+                                        var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, { minimumFontSize:30, "page-width":200, "page-height":200, pageSize: 'A4', output: `${filepath}`, cookie: [
+                                                [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
+                                            ],
+                                            javascriptDelay: 2000
+                                        }).on('close', function (response) {
+                                            const message = {
+                                                from: 'brian.e.k@gmx.com',
+                                                to: 'b1985e.k@kindle.com',
+                                                subject: 'convert rM_send',
+                                                attachments: [
+                                                    { path: filepath }
                                                 ],
-                                            text: 'See attachment'
-                                        };
-                                        transporter.sendMail(message, (error, info) => {
-                                            if (error) {
-                                                console.log(error);
-                                                res.status(400).send({success: false})
-                                            } else {
-                                                console.log('sent email')
-                                                res.status(200).send({success: true});
-                                            }
+                                                text: 'See attachment'
+                                            };
+                                            transporter.sendMail(message, (error, info) => {
+                                                if (error) {
+                                                    console.log(error);
+                                                    res.status(400).send({success: false})
+                                                } else {
+                                                    console.log('emailed to kindle')
+                                                    res.status(200).send({success: true});
+                                                }
+                                            });
                                         });
 
                                     });
