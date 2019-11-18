@@ -188,7 +188,7 @@ function instapaper_to_pdf() {
                                         console.log(`${filename} uploaded to rM`);
                                         //EMAIL TO KINDLE
 
-                                        var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, { minimumFontSize:30, "page-width":200, "page-height":200, pageSize: 'A4', output: `${filepath}`, cookie: [
+                                        var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, { minimumFontSize:30, "disable-smart-shrinking":true, "margin-top":0,"margin-bottom":0, "margin-left":0, "margin-right":0, pageSize: 'A4', output: `${filepath}`, cookie: [
                                                 [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
                                             ],
                                             javascriptDelay: 2000
