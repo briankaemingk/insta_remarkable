@@ -62,7 +62,8 @@ app.post('/archive', function (req, res) {
         if(returnvalue.includes(file)){
             file = `${slugify(title, {replacement: '-', remove: slugRemove, lower: true})}`;
             os.execCommand(`./rmapi rm ${file}`, function (returnvalue) {
-                console.log(`Removing ${file} from rm`)
+                console.log(`Removing ${file} from rm`);
+                res.status(200).send({success: true});
             });
         }
     });
