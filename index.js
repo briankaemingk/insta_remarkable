@@ -66,6 +66,10 @@ app.post('/archive', function (req, res) {
                 res.status(200).send({success: true});
             });
         }
+        else{
+            console.log(`File ${file} not found on rm`);
+            res.status(200).send({success: true});
+        }
     });
 });
 
