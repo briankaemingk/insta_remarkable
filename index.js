@@ -15,6 +15,7 @@ app.use(express.json());
 
 require('dotenv').config()
 
+const slugRemove = /[$*_+~.,/()'"!\-:@]/g;
 
 let transporter = nodemailer.createTransport({
     host: 'mail.gmx.com',
@@ -53,9 +54,22 @@ app.get('/', function (req, res) {
     res.send('Complete')
 });
 
+app.post('/archive', function (req, res) {
+    console.log(`Called archive from web`);
+    var title = req.body.title;
+    file = `${slugify(title, {replacement: '-', remove: slugRemove, lower: true})}`;
+    os.execCommand(`./rmapi find . ${file}`, function (returnvalue) {
+        if(returnvalue.includes(file)){
+            file = `${slugify(title, {replacement: '-', remove: slugRemove, lower: true})}`;
+            os.execCommand(`./rmapi rm ${file}`, function (returnvalue) {
+                console.log(`Removing ${file} from rm`)
+            });
+        }
+    });
+});
+
 
 app.post('/send', function (req, res) {
-
     console.log(`Called send from web`);
     var uri = req.body.url;
     var subject = req.body.subject;
@@ -66,7 +80,15 @@ app.post('/send', function (req, res) {
     download(uri, filepath, function(){
         os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
             console.log(`${filepath} uploaded to rM`);
-            console.log(`Subject: ${subject}`);
+
+            // var pdfWriter = require('../hummus').createWriter(__dirname + '/output/AppendPagesTest.pdf');
+            //
+            // pdfWriter.appendPDFPagesFromPDF(__dirname + '/TestMaterials/Original.pdf');
+            // pdfWriter.appendPDFPagesFromPDF(__dirname + '/TestMaterials/XObjectContent.PDF');
+            // pdfWriter.appendPDFPagesFromPDF(__dirname + '/TestMaterials/BasicTIFFImagesTest.PDF');
+            //
+            // pdfWriter.end();
+
             //EMAIL TO KINDLE
             const message = {
                 from: 'brian.e.k@gmx.com',
@@ -161,7 +183,6 @@ function instapaper_to_pdf() {
 
         page.articles.forEach(function (article) {
             console.log(`https://www.instapaper.com${article.url}`);
-            const slugRemove = /[$*_+~.,/()'"!\-:@]/g;
             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
             filename = `${file}.pdf`;
             filepath = `./pdfs/${filename}`;
