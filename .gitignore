@@ -3,3 +3,5 @@
 *.pdf
 package-lock.json
 *.idea
+.rmapi
+.env
