@@ -15,6 +15,19 @@ app.use(express.json());
 
 require('dotenv').config()
 
+
+fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
+    "usertoken: " + process.env.usertoken, function(err) {
+
+    if(err) {
+        return console.log(err);
+    }
+
+    console.log("The file was saved!");
+});
+
+
+
 const slugRemove = /[$*_+~.,/()'"!\-:@]/g;
 
 let transporter = nodemailer.createTransport({
