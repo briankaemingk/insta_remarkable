@@ -23,7 +23,7 @@ fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
         return console.log(err);
     }
 
-    console.log("The file was saved!");
+    console.log("Saved config file");
 });
 
 
@@ -61,7 +61,7 @@ var download = function(uri, filename, callback){
 
 
 
-app.post('/', function (req, res) {
+app.get('/', function (req, res) {
     console.log(`Called from web`);
     var source_url = req.body.url;
     scrapeIt({
