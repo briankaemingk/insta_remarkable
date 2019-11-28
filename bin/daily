@@ -1,4 +1,4 @@
-#! /app/bin/node
+#! /instapaper-as-pdf-to-remarkable/bin/node
 function daily() {
     console.log('Hello');
 }
