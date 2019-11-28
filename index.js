@@ -13,7 +13,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(express.json());
 
 
-require('dotenv').config()
+require('dotenv').config();
 
 
 fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
@@ -231,26 +231,7 @@ var instapaperCookies = [
         value: process.env.INSTAPAPER_PFH,
         domain: 'www.instapaper.com'
     }
-]
-
-
-var WSJCookies = [
-    {
-        name: 'gckp',
-        value: 'cx:1vji9186e1cam2pm5i2e3z0xkv:1iz1f0ygho2hw',
-        domain: '.cxense.com'
-    },
-    {
-        name: '_scid',
-        value: 'd88e10d1-13d4-42ce-9a6c-1e38a975b3ec',
-        domain: '.wsj.com'
-    },
-    {
-        name: 'djcs_auto',
-        value: 'M1571864624%2FBqVzsu9H8O%2FjurqXzvxyq1oy%2BcS7TiaoPkwwSMQPHSxaZFcFuKC36H9KHyEErKu0gO7yq8WQw3xoJBiTP5DadVnjbkRX0WNqqbxBVvSEMu7rNYGGLpS5NKI%2BHTJE9Ca7VI7Ip8gam3wPbaqBJY76sCwpmjRJgzDQWNbnT21BzBFg2OumrV15KjtzqdQz6M2YySVdzrPn0S5PiGcMAUTzL0tlUPzV4OUwXWaWtpIdBPZvwtK%2Fc%2BE%2BxckXajsuoXgDrwpMLgQPYT5IqXrTF2YKkezJ%2F0kjcWjuaNta1X9AnztljC4LqNQCj%2BI1cPgJOyJx8KErQmg%2BGKlHlATsd1Npsg%3D%3DG',
-        domain: '.wsj.com'
-    }
-]
+];
 
 
 var server = app.listen(app.get('port'), function() {
