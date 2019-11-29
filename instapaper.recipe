@@ -4,7 +4,9 @@
 # Source: https://github.com/kovidgoyal/calibre/blob/master/recipes/instapaper.recipe
 
 from calibre.web.feeds.news import BasicNewsRecipe
-
+from PyQt5.QtWebEngineCore import QWebEngineUrlScheme
+from PyQt5.QtWebEngineWidgets import QWebEnginePage  # noqa
+from calibre.gui2 import
 
 class AdvancedUserRecipe1299694372(BasicNewsRecipe):
     title = u'Instapaper'
