@@ -96,8 +96,8 @@ app.get('/', function (req, res) {
                 if(!returnvalue.includes(file)) {
                     console.log(`${file} isn't on rM device`);
 
-                    os.execCommand(`ebook-convert instapaper.recipe .pdf --username ${process.env.insta_username} --password ${process.env.insta_password} --test -vv --debug-pipeline debug`, function (returnvalue) {
-                        console.log(returnvalue);
+                    // os.execCommand(`ebook-convert instapaper.recipe .pdf --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
+                    //     console.log(returnvalue);
 
                         var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, {
                             output: `${filepath}`, cookie: [
@@ -155,7 +155,7 @@ app.get('/', function (req, res) {
 
                             });
                         })
-                    })
+                    //})
                 }
             });
 
