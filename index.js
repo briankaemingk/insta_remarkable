@@ -5,7 +5,6 @@ var express = require('express');
 var wkhtmltopdf = require('wkhtmltopdf');
 const nodemailer = require('nodemailer');
 var path = require("path");
-
 var fs = require('fs'),
     request = require('request');
 var app = express();
@@ -59,7 +58,9 @@ var download = function(uri, filename, callback){
     });
 };
 
-
+os.execCommand(`ebook-convert instapaper.recipe .pdf --username ${process.env.insta_username} --password ${process.env.insta_password} --test`, function (returnvalue) {
+    console.log(returnvalue);
+});
 
 app.get('/', function (req, res) {
     console.log(`Called from web`);
@@ -92,52 +93,69 @@ app.get('/', function (req, res) {
                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                 filename = `${file}.pdf`;
                 filepath = `./pdfs/${filename}`;
-                if(!returnvalue.includes(file))
-                {
+                if(!returnvalue.includes(file)) {
                     console.log(`${file} isn't on rM device`);
-                    var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, { output: `${filepath}`, cookie: [
-                            [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
-                        ],
-                        javascriptDelay: 2000
-                    }).on('close', function (response){
-                        filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
-                        filepath = `./pdfs/${filename}`;
-                        console.log(`stored ${filename}`);
 
-                        os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
+                    os.execCommand(`ebook-convert instapaper.recipe .pdf --username ${process.env.insta_username} --password ${process.env.insta_password} --test -vv --debug-pipeline debug`, function (returnvalue) {
+                        console.log(returnvalue);
+
+                        var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, {
+                            output: `${filepath}`, cookie: [
+                                [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
+                            ],
+                            javascriptDelay: 2000
+                        }).on('close', function (response) {
                             filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
                             filepath = `./pdfs/${filename}`;
-                            console.log(`${filename} uploaded to rM`);
-                            //EMAIL TO KINDLE
+                            console.log(`stored ${filename}`);
 
-                            var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, { minimumFontSize:30, "disable-smart-shrinking":true, "margin-top":0,"margin-bottom":0, "margin-left":0, "margin-right":0, pageSize: 'A4', output: `${filepath}`, cookie: [
-                                    [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
-                                ],
-                                javascriptDelay: 2000
-                            }).on('close', function (response) {
-                                const message = {
-                                    from: 'brian.e.k@gmx.com',
-                                    to: 'b1985e.k@kindle.com',
-                                    subject: 'convert rM_send',
-                                    attachments: [
-                                        { path: filepath }
+                            os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
+                                filename = `${slugify(article.title, {
+                                    replacement: '-',
+                                    remove: slugRemove,
+                                    lower: true
+                                })}.pdf`;
+                                filepath = `./pdfs/${filename}`;
+                                console.log(`${filename} uploaded to rM`);
+                                //EMAIL TO KINDLE
+
+                                var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, {
+                                    minimumFontSize: 30,
+                                    "disable-smart-shrinking": true,
+                                    "margin-top": 0,
+                                    "margin-bottom": 0,
+                                    "margin-left": 0,
+                                    "margin-right": 0,
+                                    pageSize: 'A4',
+                                    output: `${filepath}`,
+                                    cookie: [
+                                        [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
                                     ],
-                                    text: 'See attachment'
-                                };
-                                transporter.sendMail(message, (error, info) => {
-                                    if (error) {
-                                        console.log(error);
-                                        res.status(400).send({success: false})
-                                    } else {
-                                        console.log('emailed to kindle')
-                                        res.status(200).send({success: true});
-                                    }
+                                    javascriptDelay: 2000
+                                }).on('close', function (response) {
+                                    const message = {
+                                        from: 'brian.e.k@gmx.com',
+                                        to: 'b1985e.k@kindle.com',
+                                        subject: 'convert rM_send',
+                                        attachments: [
+                                            {path: filepath}
+                                        ],
+                                        text: 'See attachment'
+                                    };
+                                    transporter.sendMail(message, (error, info) => {
+                                        if (error) {
+                                            console.log(error);
+                                            res.status(400).send({success: false})
+                                        } else {
+                                            console.log('emailed to kindle')
+                                            res.status(200).send({success: true});
+                                        }
+                                    });
                                 });
+
                             });
-
-                        });
+                        })
                     })
-
                 }
             });
 
