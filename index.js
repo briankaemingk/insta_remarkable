@@ -116,30 +116,19 @@ app.get('/', function (req, res) {
                             filepath = `./pdfs/${filename}`;
                             console.log('Created split epub file');
                             console.log(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet`);
-
-                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath}`, function (returnvalue) {
-                                console.log(returnvalue);
+                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                                filename = `${file}.pdf`;
                                 filepath = `./pdfs/${filename}`;
-                                console.log(`${filepath} uploaded to rM`);
-                                console.log("Complete")
+                                console.log(returnvalue);
+                                console.log('${filepath} - Created split pdf file');
+                                os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
+                                    console.log(returnvalue);
+                                    filepath = `./pdfs/${filename}`;
+                                    console.log(`${filepath} uploaded to rM`);
+                                    console.log("Complete")
+                                });
                             });
-
-
-                            // os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
-                            //     file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
-                            //     filename = `${file}.pdf`;
-                            //     filepath = `./pdfs/${filename}`;
-                            //     console.log(returnvalue);
-                            //     console.log('${filepath} - Created split pdf file');
-                            //     console.log(`./rmapi put ${filepath}`);
-
-                                // os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-                                //     console.log(returnvalue);
-                                //     filepath = `./pdfs/${filename}`;
-                                //     console.log(`${filepath} uploaded to rM`);
-                                //     console.log("Complete")
-                                // });
-                            //});
                         });
                     });
 
