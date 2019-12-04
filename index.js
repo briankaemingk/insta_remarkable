@@ -2,7 +2,6 @@ const scrapeIt = require("scrape-it")
 const slugify = require('slugify')
 const exec = require('child_process').exec;
 var express = require('express');
-var wkhtmltopdf = require('wkhtmltopdf');
 const nodemailer = require('nodemailer');
 var path = require("path");
 var fs = require('fs');
@@ -72,7 +71,7 @@ var download = function(uri, filename, callback){
 
 app.get('/', function (req, res) {
     console.log(`Called from web`);
-    var source_url = req.body.rr4gurl;
+    var source_url = req.body.url;
     scrapeIt({
         url: "https://www.instapaper.com/u"
         ,
@@ -89,28 +88,34 @@ app.get('/', function (req, res) {
             }
         }
     }).then(page => {
-        //console.log(page.articles);
-
+        console.log(page.articles);
         page.articles.forEach(function (article) {
-            article_id = article.url.split('/').pop();
+            //article_id = article.url.split('/').pop();
             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+            console.log(file);
             filename = `${file}.pdf`;
             filepath = `./pdfs/${filename}`;
 
             os.execCommand(`./rmapi find .`, function (returnvalue) {
-                article_id = article.url.split('/').pop();
+                //article_id = article.url.split('/').pop();
                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                 filename = `${file}.pdf`;
                 filepath = `./pdfs/${filename}`;
 
                 if(!returnvalue.includes(file)) {
                     console.log(`${file} isn't on rM device`);
-                    os.execCommand(`ebook-convert instapaper-single.recipe ./pdfs/${file}_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
+                    os.execCommand(`ebook-convert instapaper.recipe ./pdfs/instapaper_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
                         file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                         filename = `${file}.pdf`;
                         filepath = `./pdfs/${filename}`;
                         console.log('Created master epub file');
-                        os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${file}.epub ./pdfs/${file}_all.epub 3`, function (returnvalue) {
+
+                        console.log(`Current title is: ${file}`);
+                        index = page.articles.findIndex(x => x.title === article.title);
+                        index = index + 3;
+                        console.log(`index is: ${index}`);
+
+                        os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${file}.epub ./pdfs/instapaper_all.epub ${index}`, function (returnvalue) {
                             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                             filename = `${file}.pdf`;
                             filepath = `./pdfs/${filename}`;
@@ -122,12 +127,12 @@ app.get('/', function (req, res) {
                                 filepath = `./pdfs/${filename}`;
                                 console.log(returnvalue);
                                 console.log('${filepath} - Created split pdf file');
-                                os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-                                    console.log(returnvalue);
-                                    filepath = `./pdfs/${filename}`;
-                                    console.log(`${filepath} uploaded to rM`);
-                                    console.log("Complete")
-                                });
+                                // os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
+                                //     console.log(returnvalue);
+                                //     filepath = `./pdfs/${filename}`;
+                                //     console.log(`${filepath} uploaded to rM`);
+                                //     console.log("Complete")
+                                // });
                             });
                         });
                     });
@@ -159,8 +164,7 @@ app.get('/', function (req, res) {
 
                 }
             });
-
-        })
+        });
     });
     res.send('Complete')
 });
