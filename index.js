@@ -1,42 +1,20 @@
 const scrapeIt = require("scrape-it")
 const slugify = require('slugify')
-const exec = require('child_process').exec
+const exec = require('child_process').exec;
 var express = require('express');
 var wkhtmltopdf = require('wkhtmltopdf');
 const nodemailer = require('nodemailer');
 var path = require("path");
-var fs = require('fs'),
-    request = require('request');
+var fs = require('fs');
+var request = require('request');
 var app = express();
 app.set('port', process.env.PORT || 3000);
 app.use(express.json());
+var https = require('https');
+var url = require('url');
 
 
 require('dotenv').config();
-
-
-fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
-    "usertoken: " + process.env.usertoken, function(err) {
-
-    if(err) {
-        return console.log(err);
-    }
-
-    console.log("Saved config file");
-});
-
-
-
-const slugRemove = /[$*_+~.,/()'"!\-:@]/g;
-
-let transporter = nodemailer.createTransport({
-    host: 'mail.gmx.com',
-    port: 587,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
 
 function os_func() {
     this.execCommand = function(cmd, callback) {
@@ -52,19 +30,49 @@ function os_func() {
 }
 var os = new os_func();
 
+
+fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
+    "usertoken: " + process.env.usertoken, function(err) {
+
+    if(err) {
+        return console.log(err);
+    }
+
+    console.log("Saved config file");
+});
+
+os.execCommand(`wget  --delete-after --cookies=on --keep-session-cookies --save-cookies cookies.txt --post-data 'username=${process.env.insta_username}&password=${process.env.insta_password}' https://www.instapaper.com/user/login`, function (returnvalue) {
+    console.log("Saved cookies file");
+});
+
+os.execCommand(`calibre-customize -a EpubSplit.zip`, function (returnvalue) {
+    console.log("Added epubsplit");
+});
+
+
+
+const slugRemove = /[$*_+~.,/()'"!\-:@]/g;
+
+let transporter = nodemailer.createTransport({
+    host: 'mail.gmx.com',
+    port: 587,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+
+
 var download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
         request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
     });
 };
 
-os.execCommand(`ebook-convert instapaper.recipe .pdf --username ${process.env.insta_username} --password ${process.env.insta_password} --test`, function (returnvalue) {
-    console.log(returnvalue);
-});
 
 app.get('/', function (req, res) {
     console.log(`Called from web`);
-    var source_url = req.body.url;
+    var source_url = req.body.rr4gurl;
     scrapeIt({
         url: "https://www.instapaper.com/u"
         ,
@@ -81,81 +89,85 @@ app.get('/', function (req, res) {
             }
         }
     }).then(page => {
-        console.log(page.articles);
+        //console.log(page.articles);
 
         page.articles.forEach(function (article) {
-            console.log(`https://www.instapaper.com${article.url}`);
+            article_id = article.url.split('/').pop();
             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
             filename = `${file}.pdf`;
             filepath = `./pdfs/${filename}`;
 
             os.execCommand(`./rmapi find .`, function (returnvalue) {
+                article_id = article.url.split('/').pop();
                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                 filename = `${file}.pdf`;
                 filepath = `./pdfs/${filename}`;
+
                 if(!returnvalue.includes(file)) {
                     console.log(`${file} isn't on rM device`);
-
-                    // os.execCommand(`ebook-convert instapaper.recipe .pdf --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
-                    //     console.log(returnvalue);
-
-                        var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, {
-                            output: `${filepath}`, cookie: [
-                                [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
-                            ],
-                            javascriptDelay: 2000
-                        }).on('close', function (response) {
-                            filename = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}.pdf`;
+                    os.execCommand(`ebook-convert instapaper-single.recipe ./pdfs/${file}_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
+                        file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                        filename = `${file}.pdf`;
+                        filepath = `./pdfs/${filename}`;
+                        console.log('Created master epub file');
+                        os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${file}.epub ./pdfs/${file}_all.epub 3`, function (returnvalue) {
+                            file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                            filename = `${file}.pdf`;
                             filepath = `./pdfs/${filename}`;
-                            console.log(`stored ${filename}`);
+                            console.log('Created split epub file');
+                            console.log(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet`);
 
-                            os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-                                filename = `${slugify(article.title, {
-                                    replacement: '-',
-                                    remove: slugRemove,
-                                    lower: true
-                                })}.pdf`;
+                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath}}`, function (returnvalue) {
+                                console.log(returnvalue);
                                 filepath = `./pdfs/${filename}`;
-                                console.log(`${filename} uploaded to rM`);
-                                //EMAIL TO KINDLE
-
-                                var stream = wkhtmltopdf(`https://www.instapaper.com${article.url}`, {
-                                    minimumFontSize: 30,
-                                    "disable-smart-shrinking": true,
-                                    "margin-top": 0,
-                                    "margin-bottom": 0,
-                                    "margin-left": 0,
-                                    "margin-right": 0,
-                                    pageSize: 'A4',
-                                    output: `${filepath}`,
-                                    cookie: [
-                                        [`pfp`, `${process.env.INSTAPAPER_PFP}`], [`pfu`, `${process.env.INSTAPAPER_PFU}`], [`pfh`, `${process.env.INSTAPAPER_PFH}`]
-                                    ],
-                                    javascriptDelay: 2000
-                                }).on('close', function (response) {
-                                    const message = {
-                                        from: 'brian.e.k@gmx.com',
-                                        to: 'b1985e.k@kindle.com',
-                                        subject: 'convert rM_send',
-                                        attachments: [
-                                            {path: filepath}
-                                        ],
-                                        text: 'See attachment'
-                                    };
-                                    transporter.sendMail(message, (error, info) => {
-                                        if (error) {
-                                            console.log(error);
-                                            res.status(400).send({success: false})
-                                        } else {
-                                            console.log('emailed to kindle')
-                                            res.status(200).send({success: true});
-                                        }
-                                    });
-                                });
-
+                                console.log(`${filepath} uploaded to rM`);
+                                console.log("Complete")
                             });
-                        })
-                    //})
+
+
+                            // os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                            //     file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                            //     filename = `${file}.pdf`;
+                            //     filepath = `./pdfs/${filename}`;
+                            //     console.log(returnvalue);
+                            //     console.log('${filepath} - Created split pdf file');
+                            //     console.log(`./rmapi put ${filepath}`);
+
+                                // os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
+                                //     console.log(returnvalue);
+                                //     filepath = `./pdfs/${filename}`;
+                                //     console.log(`${filepath} uploaded to rM`);
+                                //     console.log("Complete")
+                                // });
+                            //});
+                        });
+                    });
+
+
+
+                    // os.execCommand(`wget  --delete-after --cookies=on --keep-session-cookies --save-cookies cookies.txt --post-data 'username=${process.env.insta_username}&password=${process.env.insta_password}' https://www.instapaper.com/user/login`, function (returnvalue) {
+                    //     file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                    //     filename = `${file}.pdf`;
+                    //     filepath = `./pdfs/${filename}`;
+                    //     os.execCommand(`wget -O ./pdfs/instapaper.epub --cookies=on --load-cookies=cookies.txt http://www.instapaper.com/epub`, function (returnvalue) {
+                    //         file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                    //         filename = `${file}.pdf`;
+                    //         filepath = `./pdfs/${filename}`;
+                    //         os.execCommand(`calibre-debug -x ./pdfs/instapaper.epub ./pdfs`, function (returnvalue) {
+                    //             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                    //             filename = `${file}.pdf`;
+                    //             filepath = `./pdfs/${filename}`;
+                    //             os.execCommand(`ebook-convert ./pdfs/story0.html ./pdfs/${filename} -vv`, function (returnvalue) {
+                    //                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                    //                 filename = `${file}.pdf`;
+                    //                 filepath = `./pdfs/${filename}`;
+                    //                 console.log(returnvalue)
+                    //             });
+                    //         });
+                    //     });
+                    // });
+
+
                 }
             });
 
@@ -196,13 +208,6 @@ app.post('/send', function (req, res) {
         os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
             console.log(`${filepath} uploaded to rM`);
 
-            // var pdfWriter = require('../hummus').createWriter(__dirname + '/output/AppendPagesTest.pdf');
-            //
-            // pdfWriter.appendPDFPagesFromPDF(__dirname + '/TestMaterials/Original.pdf');
-            // pdfWriter.appendPDFPagesFromPDF(__dirname + '/TestMaterials/XObjectContent.PDF');
-            // pdfWriter.appendPDFPagesFromPDF(__dirname + '/TestMaterials/BasicTIFFImagesTest.PDF');
-            //
-            // pdfWriter.end();
 
             //EMAIL TO KINDLE
             const message = {

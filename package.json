@@ -9,6 +9,7 @@
     "hummus": "^1.0.108",
     "nodemailer": "^6.3.1",
     "npm": "^6.12.0",
+    "requestify": "^0.2.5",
     "scrape-it": "^4.1.0",
     "slugify": "^1.2.7",
     "wkhtmltopdf": "^0.3.4"
