@@ -127,12 +127,12 @@ app.get('/', function (req, res) {
                                 filepath = `./pdfs/${filename}`;
                                 console.log(returnvalue);
                                 console.log('${filepath} - Created split pdf file');
-                                // os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-                                //     console.log(returnvalue);
-                                //     filepath = `./pdfs/${filename}`;
-                                //     console.log(`${filepath} uploaded to rM`);
-                                //     console.log("Complete")
-                                // });
+                                os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
+                                    console.log(returnvalue);
+                                    filepath = `./pdfs/${filename}`;
+                                    console.log(`${filepath} uploaded to rM`);
+                                    console.log("Complete")
+                                });
                             });
                         });
                     });
