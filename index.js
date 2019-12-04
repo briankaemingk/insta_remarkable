@@ -117,7 +117,7 @@ app.get('/', function (req, res) {
                             console.log('Created split epub file');
                             console.log(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet`);
 
-                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath}}`, function (returnvalue) {
+                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath}`, function (returnvalue) {
                                 console.log(returnvalue);
                                 filepath = `./pdfs/${filename}`;
                                 console.log(`${filepath} uploaded to rM`);

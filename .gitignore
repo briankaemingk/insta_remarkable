@@ -5,3 +5,4 @@ package-lock.json
 *.idea
 .rmapi
 .env
+cookies.txt
