@@ -1,5 +1,6 @@
 #! /app/.heroku/node/bin/node
 
+require('dotenv').config();
 const exec = require('child_process').exec
 
 function os_func() {
@@ -16,8 +17,9 @@ function os_func() {
 var os = new os_func();
 
 function daily() {
-    os.execCommand(`./rmapi find .`, function (returnvalue) {
+    os.execCommand(`ebook-convert "The Wall Street Journal.recipe" ./pdfs/wsj-today.epub  --output-profile tablet --username ${process.env.wsj_username} --password ${process.env.wsj_password}`, function (returnvalue) {
     console.log(returnvalue);
+    process.exit();
     });
 }
 daily();
