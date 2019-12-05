@@ -90,14 +90,12 @@ app.get('/', function (req, res) {
     }).then(page => {
         console.log(page.articles);
         page.articles.forEach(function (article) {
-            //article_id = article.url.split('/').pop();
             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
             console.log(file);
             filename = `${file}.pdf`;
             filepath = `./pdfs/${filename}`;
 
             os.execCommand(`./rmapi find .`, function (returnvalue) {
-                //article_id = article.url.split('/').pop();
                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                 filename = `${file}.pdf`;
                 filepath = `./pdfs/${filename}`;
@@ -108,60 +106,55 @@ app.get('/', function (req, res) {
                         file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                         filename = `${file}.pdf`;
                         filepath = `./pdfs/${filename}`;
-                        console.log('Created master epub file');
 
-                        console.log(`Current title is: ${file}`);
                         index = page.articles.findIndex(x => x.title === article.title);
                         index = index + 3;
-                        console.log(`index is: ${index}`);
 
                         os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${file}.epub ./pdfs/instapaper_all.epub ${index}`, function (returnvalue) {
                             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                             filename = `${file}.pdf`;
                             filepath = `./pdfs/${filename}`;
-                            console.log('Created split epub file');
-                            console.log(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet`);
                             os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                                 filename = `${file}.pdf`;
                                 filepath = `./pdfs/${filename}`;
-                                console.log(returnvalue);
-                                console.log('${filepath} - Created split pdf file');
                                 os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-                                    console.log(returnvalue);
                                     filepath = `./pdfs/${filename}`;
-                                    console.log(`${filepath} uploaded to rM`);
-                                    console.log("Complete")
+                                    console.log("Completed rM upload");
+
+                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
+                                        file = `${slugify(article.title, {
+                                            replacement: '-',
+                                            remove: slugRemove,
+                                            lower: true
+                                        })}`;
+                                        filename = `${file}.pdf`;
+                                        filepath = `./pdfs/${filename}`;
+
+                                        //EMAIL TO KINDLE
+                                        const message = {
+                                            from: 'brian.e.k@gmx.com',
+                                            to: 'b1985e.k@kindle.com',
+                                            subject: 'convert rM_send',
+                                            attachments: [
+                                                { path: `./pdfs/${file}.mobi` }
+                                            ],
+                                            text: 'See attachment'
+                                        };
+                                        transporter.sendMail(message, (error, info) => {
+                                            if (error) {
+                                                console.log(error);
+                                                res.status(400).send({success: false})
+                                            } else {
+                                                console.log('Sent to Kindle');
+                                                res.status(200).send({success: true});
+                                            }
+                                        });
+                                    });
                                 });
                             });
                         });
                     });
-
-
-
-                    // os.execCommand(`wget  --delete-after --cookies=on --keep-session-cookies --save-cookies cookies.txt --post-data 'username=${process.env.insta_username}&password=${process.env.insta_password}' https://www.instapaper.com/user/login`, function (returnvalue) {
-                    //     file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
-                    //     filename = `${file}.pdf`;
-                    //     filepath = `./pdfs/${filename}`;
-                    //     os.execCommand(`wget -O ./pdfs/instapaper.epub --cookies=on --load-cookies=cookies.txt http://www.instapaper.com/epub`, function (returnvalue) {
-                    //         file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
-                    //         filename = `${file}.pdf`;
-                    //         filepath = `./pdfs/${filename}`;
-                    //         os.execCommand(`calibre-debug -x ./pdfs/instapaper.epub ./pdfs`, function (returnvalue) {
-                    //             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
-                    //             filename = `${file}.pdf`;
-                    //             filepath = `./pdfs/${filename}`;
-                    //             os.execCommand(`ebook-convert ./pdfs/story0.html ./pdfs/${filename} -vv`, function (returnvalue) {
-                    //                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
-                    //                 filename = `${file}.pdf`;
-                    //                 filepath = `./pdfs/${filename}`;
-                    //                 console.log(returnvalue)
-                    //             });
-                    //         });
-                    //     });
-                    // });
-
-
                 }
             });
         });
