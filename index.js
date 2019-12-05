@@ -103,7 +103,7 @@ app.get('/', function (req, res) {
                 if(!returnvalue.includes(file)) {
                     console.log(`${file} isn't on rM device`);
 
-                    os.execCommand(`ebook-convert instapaper.recipe ./pdfs/instapaper_all.epub --asciiize --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
+                    os.execCommand(`ebook-convert instapaper.recipe ./pdfs/instapaper_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
                         file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                         filename = `${file}.pdf`;
                         filepath = `./pdfs/${filename}`;
@@ -125,7 +125,7 @@ app.get('/', function (req, res) {
                                     filepath = `./pdfs/${filename}`;
                                     console.log("Completed rM upload");
 
-                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${article.title}" --asciiize --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title r"${article.title}" --asciiize --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                         file = `${slugify(article.title, {
                                             replacement: '-',
                                             remove: slugRemove,
