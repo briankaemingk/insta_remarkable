@@ -105,7 +105,7 @@ app.get('/', function (req, res) {
                 if(!returnvalue.includes(file)) {
                     console.log(`${file} isn't on rM device`);
 
-                    os.execCommand(`ebook-convert instapaper.recipe ./pdfs/instapaper_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
+                    os.execCommand(`ebook-convert Instapaper.recipe ./pdfs/instapaper_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
                         file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                         filename = `${file}.pdf`;
                         filepath = `./pdfs/${filename}`;
