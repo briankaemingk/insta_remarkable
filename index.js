@@ -124,7 +124,7 @@ app.get('/', function (req, res) {
                                     filepath = `./pdfs/${filename}`;
                                     console.log("Completed rM upload");
 
-                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title ${article.title} --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title '${article.title}' --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                         file = `${slugify(article.title, {
                                             replacement: '-',
                                             remove: slugRemove,
