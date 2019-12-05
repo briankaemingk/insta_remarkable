@@ -16,7 +16,7 @@ function os_func() {
 var os = new os_func();
 
 function daily() {
-    os.execCommand(`../rmapi find .`, function (returnvalue) {
+    os.execCommand(`./rmapi find .`, function (returnvalue) {
     console.log(returnvalue);
     });
 }
