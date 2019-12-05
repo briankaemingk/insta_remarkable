@@ -18,11 +18,11 @@ var os = new os_func();
 
 function daily() {
     //Generate master WSJ epub
-    os.execCommand(`ebook-convert "The Wall Street Journal.recipe" ./pdfs/wsj-today.epub  --output-profile tablet --username ${process.env.wsj_username} --password ${process.env.wsj_password}`, function (returnvalue) {
+    os.execCommand(`ebook-convert "The Wall Street Journal.recipe" ./pdfs/WSJ-TODAY.epub  --output-profile tablet --username ${process.env.wsj_username} --password ${process.env.wsj_password}`, function (returnvalue) {
         console.log("Generated master WSJ epub");
 
         //Remove old WSJ
-        os.execCommand(`./rmapi rm wsj-today.epub`, function (returnvalue) {
+        os.execCommand(`./rmapi rm WSJ-TODAY`, function (returnvalue) {
             //Send WSJ to rM
             os.execCommand(`./rmapi put ./pdfs/wsj-today.epub`, function (returnvalue) {
                 console.log("Sent WSJ epub to rM");
