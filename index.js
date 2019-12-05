@@ -129,13 +129,6 @@ app.get('/', function (req, res) {
                                     title = `${slugify(article.title, {replacement: ' ', remove: slugRemove2})}`;
 
                                     os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
-                                        file = `${slugify(article.title, {
-                                            replacement: '-',
-                                            remove: slugRemove,
-                                            lower: true
-                                        })}`;
-                                        filename = `${file}.pdf`;
-                                        filepath = `./pdfs/${filename}`;
 
                                         //EMAIL TO KINDLE
                                         const message = {
