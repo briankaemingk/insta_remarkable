@@ -71,7 +71,7 @@ var download = function(uri, filename, callback){
 
 app.get('/', function (req, res) {
     console.log(`Called from web`);
-    var source_url = req.body.url;
+    //var source_url = req.body.url;
     scrapeIt({
         url: "https://www.instapaper.com/u"
         ,
@@ -88,7 +88,7 @@ app.get('/', function (req, res) {
             }
         }
     }).then(page => {
-        console.log(page.articles);
+        //console.log(page.articles);
         page.articles.forEach(function (article) {
             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
             console.log(file);
@@ -119,10 +119,12 @@ app.get('/', function (req, res) {
                                 filename = `${file}.pdf`;
                                 filepath = `./pdfs/${filename}`;
                                 os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
+                                    file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
+                                    filename = `${file}.pdf`;
                                     filepath = `./pdfs/${filename}`;
                                     console.log("Completed rM upload");
 
-                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
+                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                         file = `${slugify(article.title, {
                                             replacement: '-',
                                             remove: slugRemove,
