@@ -195,34 +195,43 @@ app.post('/send', function (req, res) {
     var url = require("url");
     var parsed = url.parse(uri);
     var name = path.basename(parsed.pathname);
-    var filepath = `./pdfs/${name}`;
-    download(uri, filepath, function(){
+    download(uri, `./pdfs/sent-${name}`, function(){
+        var name_no_path = name.split('.').slice(0, -1).join('.');
+        os.execCommand(`ebook-convert ./pdfs/sent-${name} ./pdfs/${name_no_path}_all.epub`, function (returnvalue) {
+            console.log(`Converted to master epub`);
 
-        os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-            console.log(`${filepath} uploaded to rM`);
+            os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${name_no_path}.epub  ./pdfs/${name_no_path}_all.epub 1`, function (returnvalue) {
+                os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.pdf --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                    os.execCommand(`./rmapi put  ./pdfs/${name_no_path}.pdf`, function (returnvalue) {
+                        console.log(`./pdfs/${name_no_path}.pdf uploaded to rM`);
 
 
-            //EMAIL TO KINDLE
-            const message = {
-                from: 'brian.e.k@gmx.com',
-                to: 'b1985e.k@kindle.com',
-                subject: 'convert rM_send',
-                attachments: [
-                    { path: filepath }
-                ],
-                text: 'See attachment'
-            };
-            if (subject.toLowerCase().indexOf("rm") == -1) {
-                transporter.sendMail(message, (error, info) => {
-                    if (error) {
-                        console.log(error);
-                        res.status(400).send({success: false})
-                    } else {
-                        console.log('sent email')
-                        res.status(200).send({success: true});
-                    }
+                            //EMAIL TO KINDLE
+                        const message = {
+                            from: 'brian.e.k@gmx.com',
+                            to: 'b1985e.k@kindle.com',
+                            subject: 'convert rM_send',
+                            attachments: [
+                                {path: filepath}
+                            ],
+                            text: 'See attachment'
+                        };
+                        if (subject.toLowerCase().indexOf("rm") == -1) {
+                            os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                transporter.sendMail(message, (error, info) => {
+                                if (error) {
+                                    console.log(error);
+                                    res.status(400).send({success: false})
+                                } else {
+                                    console.log('Sent to Kindle');
+                                    res.status(200).send({success: true});
+                                }
+                            });
+                        });
+                        }
+                    });
                 });
-            }
+            });
         });
     });
 
