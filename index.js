@@ -124,7 +124,7 @@ app.get('/', function (req, res) {
                                     filepath = `./pdfs/${filename}`;
                                     console.log("Completed rM upload");
 
-                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title ${article.title} --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                         file = `${slugify(article.title, {
                                             replacement: '-',
                                             remove: slugRemove,
@@ -193,6 +193,7 @@ app.post('/send', function (req, res) {
     var name = path.basename(parsed.pathname);
     var filepath = `./pdfs/${name}`;
     download(uri, filepath, function(){
+
         os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
             console.log(`${filepath} uploaded to rM`);
 
