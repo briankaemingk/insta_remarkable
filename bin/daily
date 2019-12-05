@@ -17,9 +17,27 @@ function os_func() {
 var os = new os_func();
 
 function daily() {
+    //Generate master WSJ epub
     os.execCommand(`ebook-convert "The Wall Street Journal.recipe" ./pdfs/wsj-today.epub  --output-profile tablet --username ${process.env.wsj_username} --password ${process.env.wsj_password}`, function (returnvalue) {
-    console.log(returnvalue);
-    process.exit();
+        console.log("Generated master WSJ epub");
+
+        //Remove old WSJ
+        os.execCommand(`./rmapi rm wsj-today.epub`, function (returnvalue) {
+            //Send WSJ to rM
+            os.execCommand(`./rmapi put ./pdfs/wsj-today.epub`, function (returnvalue) {
+                console.log("Sent WSJ epub to rM");
+            });
+        });
+
+        //Generate WSJ mobi
+        os.execCommand(`ebook-convert ./pdfs/wsj-today.epub ./pdfs/wsj-today.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
+            console.log("Generated WSJ mobi");
+
+            //Email WSJ mobi to Kindle
+            os.execCommand(`calibre-smtp --attachment ./pdfs/wsj-today.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+            console.log(`Emailed WSJ mobi to Kindle`);
+            });
+        });
     });
 }
 daily();
