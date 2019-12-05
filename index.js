@@ -51,6 +51,7 @@ os.execCommand(`calibre-customize -a EpubSplit.zip`, function (returnvalue) {
 
 
 const slugRemove = /[$*_+~.,/()'"!\-:@]/g;
+const slugRemove2 = /[$*_+~.,/()'"!\-:@]/g;
 
 let transporter = nodemailer.createTransport({
     host: 'mail.gmx.com',
@@ -124,8 +125,9 @@ app.get('/', function (req, res) {
                                     filename = `${file}.pdf`;
                                     filepath = `./pdfs/${filename}`;
                                     console.log("Completed rM upload");
+                                    title = `${slugify(article.title, {remove: slugRemove2})}`;
 
-                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title r"${article.title}" --asciiize --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                         file = `${slugify(article.title, {
                                             replacement: '-',
                                             remove: slugRemove,
