@@ -95,6 +95,7 @@ app.get('/', function (req, res) {
             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
             filename = `${file}.pdf`;
             filepath = `./pdfs/${filename}`;
+            console.log(file);
 
             os.execCommand(`./rmapi find .`, function (returnvalue) {
                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
