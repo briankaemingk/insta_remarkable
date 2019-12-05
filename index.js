@@ -89,7 +89,9 @@ app.get('/', function (req, res) {
         }
     }).then(page => {
         //console.log(page.articles);
-        page.articles.forEach(function (article) {
+        console.log(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${article.title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`);
+
+            page.articles.forEach(function (article) {
             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
             filename = `${file}.pdf`;
             filepath = `./pdfs/${filename}`;
@@ -123,7 +125,7 @@ app.get('/', function (req, res) {
                                     filepath = `./pdfs/${filename}`;
                                     console.log("Completed rM upload");
 
-                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${article.title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --asciiize --title "${article.title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                         file = `${slugify(article.title, {
                                             replacement: '-',
                                             remove: slugRemove,
