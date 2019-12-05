@@ -199,18 +199,18 @@ app.post('/send', function (req, res) {
                         console.log(`./pdfs/${name_no_path}.pdf uploaded to rM`);
 
 
-                            //EMAIL TO KINDLE
-                        const message = {
-                            from: 'brian.e.k@gmx.com',
-                            to: 'b1985e.k@kindle.com',
-                            subject: 'convert rM_send',
-                            attachments: [
-                                {path: filepath}
-                            ],
-                            text: 'See attachment'
-                        };
                         if (subject.toLowerCase().indexOf("rm") == -1) {
                             os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                //EMAIL TO KINDLE
+                                const message = {
+                                    from: 'brian.e.k@gmx.com',
+                                    to: 'b1985e.k@kindle.com',
+                                    subject: 'convert rM_send',
+                                    attachments: [
+                                        {path: `./pdfs/${name_no_path}.mobi`}
+                                    ],
+                                    text: 'See attachment'
+                                };
                                 transporter.sendMail(message, (error, info) => {
                                 if (error) {
                                     console.log(error);
