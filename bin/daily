@@ -6,7 +6,7 @@ function os_func() {
         this.execCommand = function(cmd, callback) {
             exec(cmd, (error, stdout, stderr) => {
                 if (error) {
-                console.error(exec error: ${error});
+                console.error(`exec error: ${error}`);
                 return;
                  }
         callback(stdout);
@@ -16,8 +16,9 @@ function os_func() {
 var os = new os_func();
 
 function daily() {
-    os.execCommand(../rmapi find ., function (returnvalue) {
+    os.execCommand(`rmapi find .`, function (returnvalue) {
     console.log(returnvalue);
     });
 }
 daily();
+
