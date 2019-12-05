@@ -130,8 +130,8 @@ app.get('/', function (req, res) {
 
                                         //EMAIL TO KINDLE
                                         const message = {
-                                            from: 'brian.e.k@gmx.com',
-                                            to: 'b1985e.k@kindle.com',
+                                            from: `${process.env.EMAIL_USER}`,
+                                            to: `${process.env.KINDLE_EMAIL}`,
                                             subject: 'convert rM_send',
                                             attachments: [
                                                 { path: `./pdfs/${file}.mobi` }
@@ -201,8 +201,8 @@ app.post('/send', function (req, res) {
                             os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                 //EMAIL TO KINDLE
                                 const message = {
-                                    from: 'brian.e.k@gmx.com',
-                                    to: 'b1985e.k@kindle.com',
+                                    from: `${process.env.EMAIL_USER}`,
+                                    to: `${process.env.KINDLE_EMAIL}`,
                                     subject: 'convert rM_send',
                                     attachments: [
                                         {path: `./pdfs/${name_no_path}.mobi`}
