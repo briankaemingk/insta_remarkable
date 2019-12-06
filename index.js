@@ -115,6 +115,7 @@ app.get('/', function (req, res) {
                             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                             filename = `${file}.pdf`;
                             filepath = `./pdfs/${filename}`;
+
                             os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
                                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                                 filename = `${file}.pdf`;
@@ -124,30 +125,14 @@ app.get('/', function (req, res) {
                                     filename = `${file}.pdf`;
                                     filepath = `./pdfs/${filename}`;
                                     console.log("Completed rM upload");
-                                    title = `${slugify(article.title, {replacement: ' ', remove: slugRemove2})}`;
+                                });
+                            });
 
-                                    os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
-
-                                        //EMAIL TO KINDLE
-                                        const message = {
-                                            from: `${process.env.EMAIL_USER}`,
-                                            to: `${process.env.KINDLE_EMAIL}`,
-                                            subject: 'convert rM_send',
-                                            attachments: [
-                                                { path: `./pdfs/${file}.mobi` }
-                                            ],
-                                            text: 'See attachment'
-                                        };
-                                        transporter.sendMail(message, (error, info) => {
-                                            if (error) {
-                                                console.log(error);
-                                                res.status(400).send({success: false})
-                                            } else {
-                                                console.log('Sent to Kindle');
-                                                res.status(200).send({success: true});
-                                            }
-                                        });
-                                    });
+                            title = `${slugify(article.title, {replacement: ' ', remove: slugRemove2})}`;
+                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                                //Email mobi to Kindle
+                                os.execCommand(`calibre-smtp --attachment ./pdfs/${file}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+                                    console.log(`Emailed mobi to Kindle`);
                                 });
                             });
                         });

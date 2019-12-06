@@ -77,7 +77,7 @@ function daily(pub) {
         os.execCommand(`ebook-convert ./pdfs/${get_file(pub)}.epub ./pdfs/${get_file(pub)}.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
             console.log(`Generated ${pub} mobi`);
 
-            //Email WSJ mobi to Kindle
+            //Email mobi to Kindle
             os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
             console.log(`Emailed ${pub} mobi to Kindle`);
             });
