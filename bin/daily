@@ -16,17 +16,48 @@ function os_func() {
 }
 var os = new os_func();
 
-function daily() {
+//Publications
+
+//WSJ
+const WSJ_file = "_wsj-today_";
+const WSJ_recipe = "The Wall Street Journal.recipe";
+
+//Seattle Times
+const seattle_times_file = "_seattle-times_";
+const seattle_times_recipe = "The Seattle Times.recipe";
+
+function get_file(pub){
+    if(pub === "WSJ") return WSJ_file;
+}
+
+function get_recipe(pub){
+    if(pub === "WSJ") return WSJ_recipe;
+    if(pub === "ST") return seattle_times_recipe;
+}
+
+function daily(pub) {
     //Generate master WSJ epub
-    os.execCommand(`ebook-convert "The Wall Street Journal.recipe" ./pdfs/WSJ-TODAY.epub  --output-profile tablet --username ${process.env.wsj_username} --password ${process.env.wsj_password}`, function (returnvalue) {
+    os.execCommand(`ebook-convert "The Wall Street Journal.recipe" ./pdfs/wsj-today.epub  --output-profile tablet --username ${process.env.wsj_username} --password ${process.env.wsj_password}`, function (returnvalue) {
         console.log("Generated master WSJ epub");
 
-        //Remove old WSJ
-        os.execCommand(`./rmapi rm WSJ-TODAY`, function (returnvalue) {
-            //Send WSJ to rM
-            os.execCommand(`./rmapi put ./pdfs/wsj-today.epub`, function (returnvalue) {
-                console.log("Sent WSJ epub to rM");
-            });
+        //Check for WSJ file
+        os.execCommand(`./rmapi find .`, function (returnvalue) {
+            if (returnvalue.includes(`wsj-today`)){
+                //Remove old WSJ
+                os.execCommand(`./rmapi rm wsj-today`, function (returnvalue) {
+                    console.log(`Removed old WSJ`);
+                         //Send WSJ to rM
+                         os.execCommand(`./rmapi put ./pdfs/wsj-today.epub`, function (returnvalue) {
+                             console.log("Sent WSJ epub to rM");
+                         });
+                 });
+             }
+             else{
+                 //Send WSJ to rM
+                 os.execCommand(`./rmapi put ./pdfs/wsj-today.epub`, function (returnvalue) {
+                     console.log("Sent WSJ epub to rM");
+                 });
+             }
         });
 
         //Generate WSJ mobi
@@ -40,5 +71,5 @@ function daily() {
         });
     });
 }
-daily();
-
+daily("ST");
+//daily("WSJ");
