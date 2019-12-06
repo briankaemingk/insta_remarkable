@@ -28,6 +28,7 @@ const seattle_times_recipe = "The Seattle Times.recipe";
 
 function get_file(pub){
     if(pub === "WSJ") return WSJ_file;
+    if(pub === "ST") return seattle_times_file;
 }
 
 function get_recipe(pub){
@@ -35,41 +36,53 @@ function get_recipe(pub){
     if(pub === "ST") return seattle_times_recipe;
 }
 
-function daily(pub) {
-    //Generate master WSJ epub
-    os.execCommand(`ebook-convert "The Wall Street Journal.recipe" ./pdfs/wsj-today.epub  --output-profile tablet --username ${process.env.wsj_username} --password ${process.env.wsj_password}`, function (returnvalue) {
-        console.log("Generated master WSJ epub");
+function get_username(pub){
+    if(pub === "WSJ") return `${process.env.wsj_username}`;
+    if(pub === "ST") return "";
+}
 
-        //Check for WSJ file
+function get_password(pub){
+    if(pub === "WSJ") return `${process.env.wsj_password}`;
+    if(pub === "ST") return "";
+}
+
+function daily(pub) {
+    //Generate master epub
+    os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.epub  --output-profile tablet --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
+        console.log(`Generated master ${pub} epub`);
+
+        //Remove old edition, then send to rM
         os.execCommand(`./rmapi find .`, function (returnvalue) {
-            if (returnvalue.includes(`wsj-today`)){
-                //Remove old WSJ
-                os.execCommand(`./rmapi rm wsj-today`, function (returnvalue) {
-                    console.log(`Removed old WSJ`);
-                         //Send WSJ to rM
-                         os.execCommand(`./rmapi put ./pdfs/wsj-today.epub`, function (returnvalue) {
-                             console.log("Sent WSJ epub to rM");
+            if (returnvalue.includes(`${get_file(pub)}`)){
+
+                //Remove old edition
+                os.execCommand(`./rmapi rm ${get_file(pub)}`, function (returnvalue) {
+                    console.log(`Removed old ${pub} edition`);
+                         //Send to rM
+                         os.execCommand(`./rmapi put ./pdfs/${get_file(pub)}.epub`, function (returnvalue) {
+                             console.log(`Sent ${pub} epub to rM`);
                          });
                  });
              }
+
+             //Send to rM
              else{
-                 //Send WSJ to rM
-                 os.execCommand(`./rmapi put ./pdfs/wsj-today.epub`, function (returnvalue) {
-                     console.log("Sent WSJ epub to rM");
+                 os.execCommand(`./rmapi put ./pdfs/${get_file(pub)}.epub`, function (returnvalue) {
+                     console.log(`Sent ${pub} epub to rM`);
                  });
              }
         });
 
         //Generate WSJ mobi
-        os.execCommand(`ebook-convert ./pdfs/wsj-today.epub ./pdfs/wsj-today.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
-            console.log("Generated WSJ mobi");
+        os.execCommand(`ebook-convert ./pdfs/${get_file(pub)}.epub ./pdfs/${get_file(pub)}.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
+            console.log(`Generated ${pub} mobi`);
 
             //Email WSJ mobi to Kindle
-            os.execCommand(`calibre-smtp --attachment ./pdfs/wsj-today.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
-            console.log(`Emailed WSJ mobi to Kindle`);
+            os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+            console.log(`Emailed ${pub} mobi to Kindle`);
             });
         });
     });
 }
+daily("WSJ");
 daily("ST");
-//daily("WSJ");
