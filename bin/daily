@@ -57,9 +57,21 @@ function get_password(pub){
     if(pub === "ST") return "";
 }
 
+function download_epub(pub, callback){
+        os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.epub  --output-profile tablet --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
+                if(returnvalue.includes(`exec error`)){
+                    console.log(`Initial ${pub} epub download failed, trying again`);
+                    download_epub(pub);
+                }
+                else{
+                    callback(`./pdfs/${get_file(pub)}.epub`);
+                }
+        });
+}
+
 function daily(pub) {
-    //Generate master epub
-    os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.epub  --output-profile tablet --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
+    //Generate master epub'
+    download_epub(pub, function(epub_filename){
         console.log(`Generated master ${pub} epub`);
 
         //Remove old edition, then send to rM
@@ -70,7 +82,7 @@ function daily(pub) {
                 os.execCommand(`./rmapi rm ${get_file(pub)}`, function (returnvalue) {
                     console.log(`Removed old ${pub} edition`);
                          //Send to rM
-                         os.execCommand(`./rmapi put ./pdfs/${get_file(pub)}.epub`, function (returnvalue) {
+                         os.execCommand(`./rmapi put ${epub_filename}`, function (returnvalue) {
                              console.log(`Sent ${pub} epub to rM`);
                          });
                  });
@@ -78,7 +90,7 @@ function daily(pub) {
 
              //Send to rM
              else{
-                 os.execCommand(`./rmapi put ./pdfs/${get_file(pub)}.epub`, function (returnvalue) {
+                 os.execCommand(`./rmapi put ${epub_filename}`, function (returnvalue) {
                      console.log(`Sent ${pub} epub to rM`);
                  });
              }
