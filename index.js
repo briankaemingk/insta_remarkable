@@ -165,6 +165,7 @@ app.post('/archive', function (req, res) {
 
 
 app.post('/send', function (req, res) {
+    res.status(200).send({success: true});
     console.log(`Called send from web`);
     var uri = req.body.url;
     var subject = req.body.subject;
@@ -186,7 +187,6 @@ app.post('/send', function (req, res) {
                                 //Email mobi to Kindle
                                 os.execCommand(`calibre-smtp --attachment ./pdfs/${name_no_path}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
                                     console.log(`Emailed mobi to Kindle`);
-                                    res.status(200).send({success: true});
                                 });
                         });
                         }
