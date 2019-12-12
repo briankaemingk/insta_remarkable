@@ -32,7 +32,7 @@ var os = new os_func();
 //Publications
 
 //WSJ
-const WSJ_file = "_wsj-today_";
+const WSJ_file = "_wsj_";
 const WSJ_recipe = "The Wall Street Journal.recipe";
 
 //Seattle Times
