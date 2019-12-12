@@ -174,7 +174,7 @@ app.post('/send', function (req, res) {
             console.log(`Converted to master epub`);
 
             os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${name_no_path}.epub  ./pdfs/${name_no_path}_all.epub 1`, function (returnvalue) {
-                os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.pdf --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.pdf --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
                     os.execCommand(`./rmapi put  ./pdfs/${name_no_path}.pdf`, function (returnvalue) {
                         console.log(`./pdfs/${name_no_path}.pdf uploaded to rM`);
 
