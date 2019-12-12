@@ -103,7 +103,7 @@ app.get('/', function (req, res) {
                 if(!returnvalue.includes(file)) {
                     console.log(`${file} isn't on rM device`);
 
-                    os.execCommand(`ebook-convert Instapaper.recipe ./pdfs/instapaper_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password}`, function (returnvalue) {
+                    os.execCommand(`ebook-convert Instapaper.recipe ./pdfs/instapaper_all.epub --username ${process.env.insta_username} --password ${process.env.insta_password} --output-profile tablet --sr1-search '<table class="touchscreen_navbar">(.|\n)*?</table>' --sr2-search 'This article was downloaded by <strong class="articles_link">(.|\n)*</a>'`, function (returnvalue) {
                         file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                         filename = `${file}.pdf`;
                         filepath = `./pdfs/${filename}`;
@@ -116,20 +116,16 @@ app.get('/', function (req, res) {
                             filename = `${file}.pdf`;
                             filepath = `./pdfs/${filename}`;
 
-                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ${filepath} --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                            os.execCommand(`./rmapi put ./pdfs/${file}.epub`, function (returnvalue) {
                                 file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                                 filename = `${file}.pdf`;
                                 filepath = `./pdfs/${filename}`;
-                                os.execCommand(`./rmapi put ${filepath}`, function (returnvalue) {
-                                    file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
-                                    filename = `${file}.pdf`;
-                                    filepath = `./pdfs/${filename}`;
-                                    console.log("Completed rM upload");
-                                });
+                                console.log("Completed rM upload");
                             });
 
+
                             title = `${slugify(article.title, {replacement: ' ', remove: slugRemove2})}`;
-                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                            os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<table class="touchscreen_navbar">(.|\n)*?</table>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
                                 //Email mobi to Kindle
                                 os.execCommand(`calibre-smtp --attachment ./pdfs/${file}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
                                     console.log(`Emailed mobi to Kindle`);
@@ -183,7 +179,7 @@ app.post('/send', function (req, res) {
                         console.log(`./pdfs/${name_no_path}.pdf uploaded to rM`);
 
                         if (subject.toLowerCase().indexOf("rm") == -1) {
-                            os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>'`, function (returnvalue) {
+                            os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
                                 //Email mobi to Kindle
                                 os.execCommand(`calibre-smtp --attachment ./pdfs/${name_no_path}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
                                     console.log(`Emailed mobi to Kindle`);
