@@ -175,7 +175,7 @@ app.post('/send', function (req, res) {
 
             os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${name_no_path}.epub  ./pdfs/${name_no_path}_all.epub 1`, function (returnvalue) {
                 os.execCommand(`./rmapi put  ./pdfs/${name_no_path}.epub`, function (returnvalue) {
-                    console.log(`{name_no_path} uploaded to rM`);
+                    console.log(`${name_no_path} uploaded to rM`);
 
                     if (subject.toLowerCase().indexOf("rm") == -1) {
                         os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
