@@ -1,4 +1,5 @@
 #! /app/.heroku/node/bin/node
+//#! /usr/local/bin/node
 
 require('dotenv').config();
 const exec = require('child_process').exec
@@ -39,24 +40,32 @@ const WSJ_recipe = "The Wall Street Journal.recipe";
 const seattle_times_file = "_seattle-times_";
 const seattle_times_recipe = "The Seattle Times.recipe";
 
+//Reddit
+const reddit_file = "_reddit_"
+const reddit_recipe = "reddit.recipe"
+
 function get_file(pub){
     if(pub === "WSJ") return WSJ_file;
     if(pub === "ST") return seattle_times_file;
+    if(pub === "RD") return reddit_file;
 }
 
 function get_recipe(pub){
     if(pub === "WSJ") return WSJ_recipe;
     if(pub === "ST") return seattle_times_recipe;
+    if(pub === "RD") return reddit_recipe
 }
 
 function get_username(pub){
     if(pub === "WSJ") return `${process.env.wsj_username}`;
     if(pub === "ST") return "";
+    if(pub === "RD") return "";
 }
 
 function get_password(pub){
     if(pub === "WSJ") return `${process.env.wsj_password}`;
     if(pub === "ST") return "";
+    if(pub === "RD") return "";
 }
 
 function download_epub(pub, callback){
@@ -103,7 +112,7 @@ function daily(pub) {
             console.log(`Generated ${pub} mobi`);
 
             //Email mobi to Kindle
-            os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+             os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
             console.log(`Emailed ${pub} mobi to Kindle`);
             });
         });
@@ -111,3 +120,4 @@ function daily(pub) {
 }
 daily("WSJ");
 daily("ST");
+//daily("RD");
