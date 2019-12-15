@@ -127,7 +127,7 @@ app.get('/', function (req, res) {
                             title = `${slugify(article.title, {replacement: ' ', remove: slugRemove2})}`;
                             os.execCommand(`ebook-convert ./pdfs/${file}.epub ./pdfs/${file}.mobi --title "${title}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<table class="touchscreen_navbar">(.|\n)*?</table>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
                                 //Email mobi to Kindle
-                                os.execCommand(`calibre-smtp --attachment ./pdfs/${file}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+                                os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
                                     console.log(`Emailed mobi to Kindle`);
                                 });
                             });
@@ -180,7 +180,7 @@ app.post('/send', function (req, res) {
                     if (subject.toLowerCase().indexOf("rm") == -1) {
                         os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
                             //Email mobi to Kindle
-                            os.execCommand(`calibre-smtp --attachment ./pdfs/${name_no_path}.mobi --relay smtp.live.com --port 587 --username ${process.env.HOTMAIL_USERNAME} --password ${process.env.HOTMAIL_PASSWORD} ${process.env.HOTMAIL_USERNAME} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+                            os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
                                 console.log(`Emailed mobi to Kindle`);
                             });
                     });
