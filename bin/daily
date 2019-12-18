@@ -1,5 +1,5 @@
-#! /app/.heroku/node/bin/node
-//#! /usr/local/bin/node
+#! /usr/bin/node
+//#! /app/.heroku/node/bin/node
 
 require('dotenv').config();
 const exec = require('child_process').exec
@@ -29,6 +29,8 @@ function os_func() {
     }
 }
 var os = new os_func();
+
+const filetype = "pdf";
 
 //Publications
 
@@ -68,22 +70,22 @@ function get_password(pub){
     if(pub === "RD") return "";
 }
 
-function download_epub(pub, callback){
-        os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.epub  --output-profile tablet --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
+function download_pub(pub, callback){
+        os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype}  --output-profile kobo --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
                 if(returnvalue.includes(`exec error`)){
-                    console.log(`Initial ${pub} epub download failed, trying again`);
-                    download_epub(pub);
+                    console.log(`Initial ${pub} pub download failed, trying again`);
+                    download_pub(pub);
                 }
                 else{
-                    callback(`./pdfs/${get_file(pub)}.epub`);
+                    callback(`./pdfs/${get_file(pub)}.${filetype}`);
                 }
         });
 }
 
 function daily(pub) {
-    //Generate master epub'
-    download_epub(pub, function(epub_filename){
-        console.log(`Generated master ${pub} epub`);
+    //Generate master pub'
+    download_pub(pub, function(pub_filename){
+        console.log(`Generated master ${pub} pub`);
 
         //Remove old edition, then send to rM
         os.execCommand(`./rmapi find .`, function (returnvalue) {
@@ -93,22 +95,22 @@ function daily(pub) {
                 os.execCommand(`./rmapi rm ${get_file(pub)}`, function (returnvalue) {
                     console.log(`Removed old ${pub} edition`);
                          //Send to rM
-                         os.execCommand(`./rmapi put ${epub_filename}`, function (returnvalue) {
-                             console.log(`Sent ${pub} epub to rM`);
+                         os.execCommand(`./rmapi put ${pub_filename}`, function (returnvalue) {
+                             console.log(`Sent ${pub} pub to rM`);
                          });
                  });
              }
 
              //Send to rM
              else{
-                 os.execCommand(`./rmapi put ${epub_filename}`, function (returnvalue) {
-                     console.log(`Sent ${pub} epub to rM`);
+                 os.execCommand(`./rmapi put ${pub_filename}`, function (returnvalue) {
+                     console.log(`Sent ${pub} pub to rM`);
                  });
              }
         });
 
         //Generate WSJ mobi
-        os.execCommand(`ebook-convert ./pdfs/${get_file(pub)}.epub ./pdfs/${get_file(pub)}.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
+        os.execCommand(`ebook-convert ./pdfs/${get_file(pub)}.${filetype} ./pdfs/${get_file(pub)}.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
             console.log(`Generated ${pub} mobi`);
 
             //Email mobi to Kindle
