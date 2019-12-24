@@ -168,6 +168,11 @@ app.post('/send', function (req, res) {
     var url = require("url");
     var parsed = url.parse(uri);
     var name = path.basename(parsed.pathname);
+    if(req.body.fn){
+        var name = `${req.body.fn}${req.body.fext}`;
+    }
+    console.log(`Filename is: ${name}`);
+
     download(uri, `./pdfs/sent-${name}`, function(){
         var name_no_path = name.split('.').slice(0, -1).join('.');
         os.execCommand(`ebook-convert ./pdfs/sent-${name} ./pdfs/${name_no_path}_all.epub --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
