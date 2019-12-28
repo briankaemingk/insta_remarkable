@@ -60,6 +60,15 @@ let transporter = nodemailer.createTransport({
     }
 });
 
+// function to create file from base64 encoded string
+function base64_decode(base64str, file) {
+    // create buffer object from base64 encoded string, it is important to tell the constructor that the string is base64 encoded
+    var bitmap = new Buffer(base64str, 'base64');
+    // write buffer to file
+    fs.writeFileSync(file, bitmap);
+    console.log('******** File created from base64 encoded string ********');
+}
+
 
 var download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
@@ -159,6 +168,25 @@ app.post('/archive', function (req, res) {
     });
 });
 
+app.post('/sendFile', function (req, res) {
+    //     req.body.data.pipe(fs.createWriteStream(req.body.filename)).on('close', function(){
+    //         console.log('Saved file');
+    // });
+    // fs.writeFile(req.body.filename, req.body.data, 'base64', function(){
+    //     console.log('
+    //     file');
+    // })
+//    base64_decode(req.body.data, req.body.filename);
+
+    fs.writeFile(req.body.filename, req.body.data, 'base64', error => {
+        if (error) {
+            throw error;
+        } else {
+            console.log('base64 saved!');
+        }
+    });
+
+});
 
 app.post('/send', function (req, res) {
     res.status(200).send({success: true});
@@ -182,7 +210,7 @@ app.post('/send', function (req, res) {
                 os.execCommand(`./rmapi put  ./pdfs/${name_no_path}.epub`, function (returnvalue) {
                     console.log(`${name_no_path} uploaded to rM`);
 
-                    if (subject.toLowerCase().indexOf("rm") == -1) {
+                    if (subject.toLowerCase().indexOf("jrm") == -1) {
                         os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
                             //Email mobi to Kindle
                             os.execCommand(`calibre-smtp --attachment ./pdfs/${name_no_path}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
