@@ -195,10 +195,12 @@ app.post('/send', function (req, res) {
     var subject = req.body.subject;
     var url = require("url");
     var parsed = url.parse(uri);
-    var name = path.basename(parsed.pathname);
+    var full_fn = path.basename(parsed.pathname);
     if(req.body.fn){
-        var name = `${req.body.fn}${req.body.fext}`;
+        var full_fn = req.body.fn;
     }
+    var name = `${slugify(full_fn, {replacement: '-', remove: slugRemove, lower: true})}`;
+    name += req.body.fext;
     console.log(`Filename is: ${name}`);
 
     download(uri, `./pdfs/sent-${name}`, function(){
