@@ -1,5 +1,5 @@
 #! /app/.heroku/node/bin/node
-// #! /usr/bin/node
+//#! /usr/bin/node
 
 require('dotenv').config();
 const exec = require('child_process').exec
@@ -29,8 +29,6 @@ function os_func() {
     }
 }
 var os = new os_func();
-
-const filetype = "pdf";
 
 //Publications
 
@@ -70,8 +68,8 @@ function get_password(pub){
     if(pub === "RD") return "";
 }
 
-function download_pub(pub, callback){
-        os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype}  --output-profile kobo --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
+function download_pub(pub, filetype, output_profile, callback){
+        os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype}  --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
                 if(returnvalue.includes(`exec error`)){
                     console.log(`Initial ${pub} pub download failed, trying again`);
                     download_pub(pub);
@@ -79,13 +77,15 @@ function download_pub(pub, callback){
                 else{
                     callback(`./pdfs/${get_file(pub)}.${filetype}`);
                 }
+        console.log(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype}  --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`)
         });
 }
 
 function daily(pub) {
-    //Generate master pub'
-    download_pub(pub, function(pub_filename){
-        console.log(`Generated master ${pub} pub`);
+
+    //Generate rM pub
+    download_pub(pub, "pdf", "kobo", function(pub_filename){
+    console.log(`Generated rM ${pub} pub`);
 
         //Remove old edition, then send to rM
         os.execCommand(`./rmapi find .`, function (returnvalue) {
@@ -108,16 +108,14 @@ function daily(pub) {
                  });
              }
         });
+    });
 
-        //Generate WSJ mobi
-        os.execCommand(`ebook-convert ./pdfs/${get_file(pub)}.${filetype} ./pdfs/${get_file(pub)}.mobi --output-profile kindle_pw3 --mobi-file-type both`, function (returnvalue) {
-            console.log(`Generated ${pub} mobi`);
-
+    //Generate kindle pub
+    download_pub(pub, "mobi", "kindle_pw3", function(pub_filename){
             //Email mobi to Kindle
              os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
             console.log(`Emailed ${pub} mobi to Kindle`);
             });
-        });
     });
 }
 daily("WSJ");
