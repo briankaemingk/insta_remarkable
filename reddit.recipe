@@ -1,0 +1,36 @@
+#!/usr/bin/env python2
+# vim:fileencoding=utf-8
+from __future__ import unicode_literals, division, absolute_import, print_function
+from calibre.web.feeds.news import BasicNewsRecipe
+
+class AdvancedUserRecipe1577732911(BasicNewsRecipe):
+    title          = 'Reddit'
+    oldest_article = 1
+    max_articles_per_feed = 100
+    auto_cleanup   = True
+
+    feeds          = [
+        ('todoist', 'https://www.reddit.com/r/todoist/.rss'),
+        ('todoist comments', 'https://www.reddit.com/r/todoist/comments.rss'),
+        ('remarkable', 'https://www.reddit.com/r/RemarkableTablet/.rss'),
+        ('remarkable comments', 'https://www.reddit.com/r/RemarkableTablet/comments.rss'),
+    ]
+
+    def parse_feeds(self):
+         # Call parent's method.
+        feeds = BasicNewsRecipe.parse_feeds(self)
+
+        # Loop through all feeds.
+        for feed in feeds:
+		feed_title = feed.title.upper()
+		# Find the comments feed
+		if feed_title.find('COMMENTS') >= 0:
+			for f in feeds:
+				# Find the corresponding non-comments feed
+				if f.title.upper() == feed_title.partition(' ')[0]:
+					# Combine the articles into the current comments feed
+					feed.articles = feed.articles + f.articles 
+					feed.articles.sort(key=lambda a: a.date)
+					feeds.remove(f)
+        return feeds
+
