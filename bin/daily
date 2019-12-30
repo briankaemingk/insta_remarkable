@@ -120,4 +120,4 @@ function daily(pub) {
 }
 daily("WSJ");
 daily("ST");
-//daily("RD");
+daily("RD");
