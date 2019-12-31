@@ -60,15 +60,6 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-// function to create file from base64 encoded string
-function base64_decode(base64str, file) {
-    // create buffer object from base64 encoded string, it is important to tell the constructor that the string is base64 encoded
-    var bitmap = new Buffer(base64str, 'base64');
-    // write buffer to file
-    fs.writeFileSync(file, bitmap);
-    console.log('******** File created from base64 encoded string ********');
-}
-
 
 var download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
@@ -168,26 +159,6 @@ app.post('/archive', function (req, res) {
     });
 });
 
-app.post('/sendFile', function (req, res) {
-    //     req.body.data.pipe(fs.createWriteStream(req.body.filename)).on('close', function(){
-    //         console.log('Saved file');
-    // });
-    // fs.writeFile(req.body.filename, req.body.data, 'base64', function(){
-    //     console.log('
-    //     file');
-    // })
-//    base64_decode(req.body.data, req.body.filename);
-
-    fs.writeFile(req.body.filename, req.body.data, 'base64', error => {
-        if (error) {
-            throw error;
-        } else {
-            console.log('base64 saved!');
-        }
-    });
-
-});
-
 app.post('/send', function (req, res) {
     res.status(200).send({success: true});
     console.log(`Called send from web`);
@@ -195,12 +166,25 @@ app.post('/send', function (req, res) {
     var subject = req.body.subject;
     var url = require("url");
     var parsed = url.parse(uri);
-    var full_fn = path.basename(parsed.pathname);
+    var full_fn;
+    var name;
+
     if(req.body.fn){
-        var full_fn = req.body.fn;
+        full_fn = req.body.fn;
     }
-    var name = `${slugify(full_fn, {replacement: '-', remove: slugRemove, lower: true})}`;
-    name += req.body.fext;
+    else {
+        full_fn = path.basename(parsed.pathname, path.extname(parsed.pathname));
+    }
+    console.log(full_fn);
+
+    if(req.body.fn){
+        name = `${slugify(full_fn, {replacement: '-', remove: slugRemove, lower: true})}`;
+        name += req.body.fext;
+    }
+    else{
+        name += path.extname(parsed.pathname)
+    }
+
     console.log(`Filename is: ${name}`);
 
     download(uri, `./pdfs/sent-${name}`, function(){
