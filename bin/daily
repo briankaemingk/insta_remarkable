@@ -77,7 +77,6 @@ function download_pub(pub, filetype, output_profile, callback){
                 else{
                     callback(`./pdfs/${get_file(pub)}.${filetype}`);
                 }
-        console.log(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype}  --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`)
         });
 }
 
