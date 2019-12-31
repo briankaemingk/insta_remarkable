@@ -1,0 +1,22 @@
+#!/bin/sh
+
+rm -r /home/root/documents
+unlink /mnt/onboard
+mkdir /home/root/documents 
+
+xochitldir=/home/root/.local/share/remarkable/xochitl/
+
+filetype="pdf"
+pubs=(_wsj_ _seattle-times_ _reddit_)
+
+for i in "${pubs[@]}"
+do
+   metafile=$(grep -rnwl $xochitldir -e $i)
+   echo "Metafile is... $metafile"
+   file="${metafile/metadata/$filetype}"
+   cp $file /home/root/documents
+   mv /home/root/documents/$(basename $file) /home/root/documents/$i.pdf
+done
+
+ln -s /home/root/documents /mnt/onboard
+/home/root/bin/plato/platorun
