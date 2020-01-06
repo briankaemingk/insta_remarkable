@@ -168,24 +168,20 @@ app.post('/send', function (req, res) {
     var parsed = url.parse(uri);
     var full_fn;
     var name;
+    var name_no_path;
 
     if(req.body.fn){
         full_fn = req.body.fn;
+        name_no_path = `${slugify(full_fn, {replacement: '-', remove: slugRemove, lower: true})}`;
+        name = name_no_path + req.body.fext;
     }
     else {
-        full_fn = path.basename(parsed.pathname, path.extname(parsed.pathname));
-    }
-    console.log(full_fn);
-
-    if(req.body.fn){
-        name = `${slugify(full_fn, {replacement: '-', remove: slugRemove, lower: true})}`;
-        name += req.body.fext;
-    }
-    else{
-        name += path.extname(parsed.pathname)
+        name_no_path = path.basename(parsed.pathname, path.extname(parsed.pathname));
+        name = name_no_path + path.extname(parsed.pathname)
     }
 
-    console.log(`Filename is: ${name}`);
+    console.log(name_no_path);
+    console.log(name);
 
     download(uri, `./pdfs/sent-${name}`, function(){
         var name_no_path = name.split('.').slice(0, -1).join('.');
