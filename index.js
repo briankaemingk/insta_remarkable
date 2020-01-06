@@ -183,27 +183,46 @@ app.post('/send', function (req, res) {
     console.log(name_no_path);
     console.log(name);
 
-    download(uri, `./pdfs/sent-${name}`, function(){
-        var name_no_path = name.split('.').slice(0, -1).join('.');
-        os.execCommand(`ebook-convert ./pdfs/sent-${name} ./pdfs/${name_no_path}_all.epub --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
-            console.log(`Converted to master epub`);
 
-            os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${name_no_path}.epub  ./pdfs/${name_no_path}_all.epub 1`, function (returnvalue) {
-                os.execCommand(`./rmapi put  ./pdfs/${name_no_path}.epub`, function (returnvalue) {
-                    console.log(`${name_no_path} uploaded to rM`);
 
-                    if (subject.toLowerCase().indexOf("jrm") == -1) {
-                        os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
-                            //Email mobi to Kindle
-                            os.execCommand(`calibre-smtp --attachment ./pdfs/${name_no_path}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
-                                console.log(`Emailed mobi to Kindle`);
-                            });
+        // If noconversion option not specified, then convert it
+         if (subject.toLowerCase().indexOf("noco") == -1) {
+             download(uri, `./pdfs/sent-${name}`, function() {
+
+                os.execCommand(`ebook-convert ./pdfs/sent-${name} ./pdfs/${name_no_path}_all.epub --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
+                    console.log(`Converted to master epub`);
+
+                    os.execCommand(`calibre-debug --run-plugin EpubSplit -- -o ./pdfs/${name_no_path}.epub  ./pdfs/${name_no_path}_all.epub 1`, function (returnvalue) {
+                        os.execCommand(`./rmapi put  ./pdfs/${name_no_path}.epub`, function (returnvalue) {
+                            console.log(`${name_no_path} uploaded to rM`);
+
+                            if (subject.toLowerCase().indexOf("jrm") == -1) {
+                                os.execCommand(`ebook-convert ./pdfs/${name_no_path}.epub ./pdfs/${name_no_path}.mobi --title "${name_no_path}" --output-profile kindle_pw3 --mobi-file-type both --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
+                                    //Email mobi to Kindle
+                                    os.execCommand(`calibre-smtp --attachment ./pdfs/${name_no_path}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+                                        console.log(`Emailed mobi to Kindle`);
+                                    });
+                                });
+                            }
+                        });
                     });
-                    }
                 });
-            });
-        });
-    });
+             });
+        }
+         // Don't convert before sending
+         else {
+             console.log("Not converting file");
+             download(uri, `./pdfs/${name}`, function () {
+                 os.execCommand(`./rmapi put  ./pdfs/${name}`, function (returnvalue) {
+                     console.log(`${name_no_path} uploaded to rM`);
+                 });
+                 if (subject.toLowerCase().indexOf("jrm") == -1) {
+                     os.execCommand(`calibre-smtp --attachment ./pdfs/${name} --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+                         console.log(`Emailed mobi to Kindle`);
+                     });
+                 }
+             });
+         }
 });
 
 
