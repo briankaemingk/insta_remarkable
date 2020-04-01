@@ -7,7 +7,7 @@ mkdir /home/root/documents
 xochitldir=/home/root/.local/share/remarkable/xochitl/
 
 filetype="pdf"
-pubs=(_wsj_ _seattle-times_ _reddit_)
+pubs=(_wsj_ _seattle-times_ _reddit_ _nytimes_)
 
 for i in "${pubs[@]}"
 do
