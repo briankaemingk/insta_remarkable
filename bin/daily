@@ -1,4 +1,5 @@
-#!/bin/sh
+#! /usr/local/bin/node
+// #!/bin/sh
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
 // /usr/bin/node
 
@@ -41,6 +42,10 @@ const WSJ_recipe = "The Wall Street Journal.recipe";
 const seattle_times_file = "_seattle-times_";
 const seattle_times_recipe = "The Seattle Times.recipe";
 
+//NYT
+const nytimes_file = "_nytimes_";
+const nytimes_recipe = "The New York Times.recipe";
+
 //Reddit
 const reddit_file = "_reddit_"
 const reddit_recipe = "reddit.recipe"
@@ -49,24 +54,28 @@ function get_file(pub){
     if(pub === "WSJ") return WSJ_file;
     if(pub === "ST") return seattle_times_file;
     if(pub === "RD") return reddit_file;
+    if(pub === "NYT") return nytimes_file;
 }
 
 function get_recipe(pub){
     if(pub === "WSJ") return WSJ_recipe;
     if(pub === "ST") return seattle_times_recipe;
-    if(pub === "RD") return reddit_recipe
+    if(pub === "RD") return reddit_recipe;
+    if(pub === "NYT") return nytimes_recipe;
 }
 
 function get_username(pub){
     if(pub === "WSJ") return `${process.env.wsj_username}`;
     if(pub === "ST") return "";
     if(pub === "RD") return "";
+    if(pub === "NYT") return `${process.env.nyt_username}`;
 }
 
 function get_password(pub){
     if(pub === "WSJ") return `${process.env.wsj_password}`;
     if(pub === "ST") return "";
     if(pub === "RD") return "";
+    if(pub === "NYT") return `${process.env.nyt_password}`;
 }
 
 function download_pub(pub, filetype, output_profile, callback){
