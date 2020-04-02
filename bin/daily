@@ -1,6 +1,6 @@
-#!/bin/sh
+#! /usr/local/bin/node
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
-// /usr/local/bin/node
+// /bin/sh
 // /usr/bin/node
 // /usr/local/bin/node
 
@@ -21,10 +21,12 @@ fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
 function os_func() {
 
 
-        this.execCommand = function(cmd, callback) {
+        this.execCommand = function(pub, cmd, callback) {
             exec(cmd, (error, stdout, stderr) => {
                 if (error) {
                 console.error(`exec error: ${error}`);
+                console.log("Retrying...")
+                daily(pub);
                 return;
                  }
         callback(stdout);
@@ -88,7 +90,7 @@ function get_password(pub){
 }
 
 function download_pub(pub, filetype, output_profile, callback){
-        os.execCommand(`ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype}  --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
+        os.execCommand(pub, `ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype}  --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
                 if(returnvalue.includes(`exec error`)){
                     console.log(`Initial ${pub} pub download failed, trying again`);
                     download_pub(pub);
@@ -106,14 +108,14 @@ function daily(pub) {
     console.log(`Generated rM ${pub} pub`);
 
         //Remove old edition, then send to rM
-        os.execCommand(`./rmapi find .`, function (returnvalue) {
+        os.execCommand(pub, `./rmapi find .`, function (returnvalue) {
             if (returnvalue.includes(`${get_file(pub)}`)){
 
                 //Remove old edition
-                os.execCommand(`./rmapi rm ${get_file(pub)}`, function (returnvalue) {
+                os.execCommand(pub, `./rmapi rm ${get_file(pub)}`, function (returnvalue) {
                     console.log(`Removed old ${pub} edition`);
                          //Send to rM
-                         os.execCommand(`./rmapi put ${pub_filename}`, function (returnvalue) {
+                         os.execCommand(pub, `./rmapi put ${pub_filename}`, function (returnvalue) {
                              console.log(`Sent ${pub} pub to rM`);
                          });
                  });
@@ -121,7 +123,7 @@ function daily(pub) {
 
              //Send to rM
              else{
-                 os.execCommand(`./rmapi put ${pub_filename}`, function (returnvalue) {
+                 os.execCommand(pub, `./rmapi put ${pub_filename}`, function (returnvalue) {
                      console.log(`Sent ${pub} pub to rM`);
                  });
              }
@@ -131,7 +133,7 @@ function daily(pub) {
     //Generate kindle pub
     download_pub(pub, "mobi", "kindle_pw3", function(pub_filename){
             //Email mobi to Kindle
-             os.execCommand(`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
+             os.execCommand(pub,`calibre-smtp --attachment ./pdfs/${get_file(pub)}.mobi --relay mail.gmx.com --port 587 --username ${process.env.EMAIL_USER} --password ${process.env.EMAIL_PASSWORD} ${process.env.EMAIL_USER} ${process.env.KINDLE_EMAIL} ""`, function (returnvalue) {
             console.log(`Emailed ${pub} mobi to Kindle`);
             });
     });
