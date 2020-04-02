@@ -1,7 +1,8 @@
 #!/bin/sh
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
-// /usr/bin/node
-// /usr/local/bin/node
+// #!/usr/local/bin/node
+// #!/usr/bin/node
+// #!/usr/local/bin/node
 
 require('dotenv').config();
 const exec = require('child_process').exec
@@ -50,11 +51,16 @@ const nytimes_recipe = "The New York Times.recipe";
 const reddit_file = "_reddit_"
 const reddit_recipe = "reddit.recipe"
 
+//New Yorker
+const new_yorker_file = "_newyorker_"
+const new_yorker_recipe = "New Yorker Magazine.recipe"
+
 function get_file(pub){
     if(pub === "WSJ") return WSJ_file;
     if(pub === "ST") return seattle_times_file;
     if(pub === "RD") return reddit_file;
     if(pub === "NYT") return nytimes_file;
+    if(pub === "NYR") return new_yorker_file;
 }
 
 function get_recipe(pub){
@@ -62,6 +68,7 @@ function get_recipe(pub){
     if(pub === "ST") return seattle_times_recipe;
     if(pub === "RD") return reddit_recipe;
     if(pub === "NYT") return nytimes_recipe;
+    if(pub === "NYR") return new_yorker_recipe;
 }
 
 function get_username(pub){
@@ -69,6 +76,7 @@ function get_username(pub){
     if(pub === "ST") return "";
     if(pub === "RD") return "";
     if(pub === "NYT") return `${process.env.nyt_username}`;
+    if(pub === "NYR") return "";
 }
 
 function get_password(pub){
@@ -76,6 +84,7 @@ function get_password(pub){
     if(pub === "ST") return "";
     if(pub === "RD") return "";
     if(pub === "NYT") return `${process.env.nyt_password}`;
+    if(pub === "NYR") return "";
 }
 
 function download_pub(pub, filetype, output_profile, callback){
@@ -136,4 +145,6 @@ else{
   daily("WSJ");
   daily("ST");
   daily("RD");
+  daily("NYT");
+  daily("NYR");
 }
