@@ -1,9 +1,9 @@
-#! /usr/local/bin/node
+#! /bin/sh
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
 // Heroku
-// /bin/sh
-// MAC
 // 
+// MAC
+// /usr/local/bin/node
 // PC
 // /usr/bin/node
 require('dotenv').config();
