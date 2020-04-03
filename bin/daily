@@ -1,13 +1,27 @@
 #! /bin/sh
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
+// Heroku
+// 
 // MAC
 // /usr/local/bin/node
 // PC
 // /usr/bin/node
-
 require('dotenv').config();
 const exec = require('child_process').exec
 var fs = require('fs');
+
+var fetch = require('isomorphic-fetch'); // or another library of choice.
+var Dropbox = require('dropbox').Dropbox;
+
+var dbx = new Dropbox({ accessToken: process.env.dropbox_auth, fetch: fetch });
+
+dbx.filesListFolder({path: ''})
+  .then(function(response) {
+    console.log(response);
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
 
 fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
     "usertoken: " + process.env.usertoken, function(err) {
@@ -116,7 +130,7 @@ function daily(pub) {
                 os.execCommand(pub, `./rmapi rm ${get_file(pub)}`, function (returnvalue) {
                     console.log(`Removed old ${pub} edition`);
                         //Send to dbx
-                        dbx.filesUpload
+
                          //Send to rM
                          os.execCommand(pub, `./rmapi put ${pub_filename}`, function (returnvalue) {
                              console.log(`Sent ${pub} pub to rM`);
