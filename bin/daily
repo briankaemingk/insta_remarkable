@@ -1,12 +1,8 @@
-#! /usr/local/bin/node
+#! /bin/sh
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
-// /bin/sh
+// /usr/local/bin/node
 // /usr/bin/node
 // /usr/local/bin/node
-
-require('dotenv').config();
-const exec = require('child_process').exec
-var fs = require('fs');
 
 fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
     "usertoken: " + process.env.usertoken, function(err) {
@@ -104,7 +100,7 @@ function download_pub(pub, filetype, output_profile, callback){
 function daily(pub) {
 
     //Generate rM pub
-    download_pub(pub, "pdf", "kobo", function(pub_filename){
+    download_pub(pub, "epub", "kobo", function(pub_filename){
     console.log(`Generated rM ${pub} pub`);
 
         //Remove old edition, then send to rM
@@ -114,6 +110,8 @@ function daily(pub) {
                 //Remove old edition
                 os.execCommand(pub, `./rmapi rm ${get_file(pub)}`, function (returnvalue) {
                     console.log(`Removed old ${pub} edition`);
+                        //Send to dbx
+                        dbx.filesUpload
                          //Send to rM
                          os.execCommand(pub, `./rmapi put ${pub_filename}`, function (returnvalue) {
                              console.log(`Sent ${pub} pub to rM`);
