@@ -1,27 +1,14 @@
-#! /bin/sh
+#! /usr/local/bin/node
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
 // Heroku
-// 
+// /bin/sh
 // MAC
-// /usr/local/bin/node
+// 
 // PC
 // /usr/bin/node
 require('dotenv').config();
 const exec = require('child_process').exec
 var fs = require('fs');
-
-var fetch = require('isomorphic-fetch'); // or another library of choice.
-var Dropbox = require('dropbox').Dropbox;
-
-var dbx = new Dropbox({ accessToken: process.env.dropbox_auth, fetch: fetch });
-
-dbx.filesListFolder({path: ''})
-  .then(function(response) {
-    console.log(response);
-  })
-  .catch(function(error) {
-    console.log(error);
-  });
 
 fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
     "usertoken: " + process.env.usertoken, function(err) {
