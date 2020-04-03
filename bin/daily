@@ -1,8 +1,13 @@
 #! /bin/sh
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
+// MAC
 // /usr/local/bin/node
+// PC
 // /usr/bin/node
-// /usr/local/bin/node
+
+require('dotenv').config();
+const exec = require('child_process').exec
+var fs = require('fs');
 
 fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
     "usertoken: " + process.env.usertoken, function(err) {
