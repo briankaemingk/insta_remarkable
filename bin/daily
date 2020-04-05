@@ -98,7 +98,10 @@ function get_password(pub){
 }
 
 function download_pub(pub, filetype, output_profile, callback){
-        os.execCommand(pub, `ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype} -vv --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`, function (returnvalue) {
+        const command = `ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype} -vv --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`;
+        console.log(command);
+    
+        os.execCommand(pub, command, function (returnvalue) {
                 if(returnvalue.includes(`exec error`)){
                     console.log(`Initial ${pub} pub download failed, trying again`);
                     download_pub(pub);
