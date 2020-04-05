@@ -3,6 +3,7 @@
 *.pdf
 package-lock.json
 *.idea
+rmapi
 .rmapi
 .env
 cookies.txt
