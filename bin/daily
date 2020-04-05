@@ -1,7 +1,7 @@
 #! /bin/sh
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
 // Heroku
-// 
+// /bin/sh
 // MAC
 // /usr/local/bin/node
 // PC
@@ -114,7 +114,7 @@ function daily(pub) {
     const filetype = "epub";
 
     //Generate rM pub
-    download_pub(pub, filetype, "kobo", function(pub_filename){
+    download_pub(pub, filetype, "tablet", function(pub_filename){
     console.log(`Generated rM ${pub} pub`);
     //Send to dbx
         dropbox({
