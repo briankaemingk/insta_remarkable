@@ -111,8 +111,8 @@ function download_pub(pub, filetype, output_profile, callback){
 
 function daily(pub) {
 
-    const filetype = "pdf";
-    const output_profile = "tablet";
+    const filetype = "epub";
+    const output_profile = "kobo";
 
     //Generate rM pub
     download_pub(pub, filetype, output_profile, function(pub_filename){
