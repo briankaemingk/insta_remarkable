@@ -8,13 +8,11 @@ seattletimes.nwsource.com
 
 from calibre.web.feeds.news import BasicNewsRecipe
 
-def get_browser(self, *args, **kwargs):
-   from calibre import browser
-   kwargs['user_agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'
-   return browser(*args, **kwargs)
-
 
 class SeattleTimes(BasicNewsRecipe):
+
+
+
     title = 'The Seattle Times'
     __author__ = 'Darko Miletic'
     description = 'News from Seattle and USA'
@@ -30,8 +28,8 @@ class SeattleTimes(BasicNewsRecipe):
     auto_cleanup_keep = '//div[@id="PhotoContainer"]'
 
     feeds = [
-        (u'Local News',
-         u'https://www.seattletimes.com/seattle-news/feed/'),
+        # (u'Local News',
+        #  u'https://www.seattletimes.com/seattle-news/feed/'),
         (u'Nation & World',
          u'https://www.seattletimes.com/nation-world/feed/'),
         (u'Business',
