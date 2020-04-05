@@ -111,10 +111,11 @@ function download_pub(pub, filetype, output_profile, callback){
 
 function daily(pub) {
 
-    const filetype = "epub";
+    const filetype = "pdf";
+    const output_profile = "tablet";
 
     //Generate rM pub
-    download_pub(pub, filetype, "tablet", function(pub_filename){
+    download_pub(pub, filetype, output_profile, function(pub_filename){
     console.log(`Generated rM ${pub} pub`);
     //Send to dbx
         dropbox({
