@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /usr/local/bin/node
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
 // Heroku
 // /bin/sh
