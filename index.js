@@ -12,6 +12,13 @@ app.use(express.json());
 var https = require('https');
 var url = require('url');
 
+const dropboxV2Api = require('dropbox-v2-api');
+
+// create session ref:
+const dropbox = dropboxV2Api.authenticate({
+    token: process.env.dropbox_auth
+});
+
 
 require('dotenv').config();
 
@@ -122,6 +129,18 @@ app.get('/', function (req, res) {
                                 filepath = `./pdfs/${filename}`;
                                 console.log("Completed rM upload");
                             });
+
+                            //Send to dbx
+                            dropbox({
+                                resource: 'files/upload',
+                                parameters: {
+                                path: process.env.dropbox_path + `${file}.epub` ,
+                                mode: 'overwrite',
+                                },
+                                readStream: fs.createReadStream(`./pdfs/${file}.epub`)}, (err, result, response) => {
+                                    //upload completed
+                                    console.log(`Uploaded to dbx`);
+                                });
 
 
                             title = `${slugify(article.title, {replacement: ' ', remove: slugRemove2})}`;
