@@ -167,7 +167,13 @@ app.post('/archive', function (req, res) {
         if(returnvalue.includes(file)){
             file = `${slugify(title, {replacement: '-', remove: slugRemove, lower: true})}`;
             os.execCommand(`./rmapi rm ${file}`, function (returnvalue) {
-                console.log(`Removing ${file} from rm`);
+                //Send to dbx
+                dropbox({
+                    resource: 'files/delete',
+                    parameters: {
+                    path: process.env.dropbox_path + `${file}.epub`
+                    },
+                });
                 res.status(200).send({success: true});
             });
         }
