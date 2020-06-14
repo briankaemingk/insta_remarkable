@@ -65,12 +65,17 @@ const reddit_recipe = "reddit.recipe"
 const new_yorker_file = "_newyorker_"
 const new_yorker_recipe = "New Yorker Magazine.recipe"
 
+//The Economist
+const economist_file = "_economist_"
+const economist_recipe = "The Economist.recipe"
+
 function get_file(pub){
     if(pub === "WSJ") return WSJ_file;
     if(pub === "ST") return seattle_times_file;
     if(pub === "RD") return reddit_file;
     if(pub === "NYT") return nytimes_file;
     if(pub === "NYR") return new_yorker_file;
+    if(pub === "EC") return economist_file;
 }
 
 function get_recipe(pub){
@@ -79,6 +84,7 @@ function get_recipe(pub){
     if(pub === "RD") return reddit_recipe;
     if(pub === "NYT") return nytimes_recipe;
     if(pub === "NYR") return new_yorker_recipe;
+    if(pub === "EC") return economist_recipe;
 }
 
 function get_username(pub){
@@ -87,6 +93,7 @@ function get_username(pub){
     if(pub === "RD") return "";
     if(pub === "NYT") return `${process.env.nyt_username}`;
     if(pub === "NYR") return "";
+    if(pub === "EC") return "";
 }
 
 function get_password(pub){
@@ -95,6 +102,7 @@ function get_password(pub){
     if(pub === "RD") return "";
     if(pub === "NYT") return `${process.env.nyt_password}`;
     if(pub === "NYR") return "";
+    if(pub === "EC") return "";
 }
 
 function download_pub(pub, filetype, output_profile, callback){
@@ -177,4 +185,5 @@ else{
   daily("RD");
   daily("NYT");
   daily("NYR");
+  daily("EC");
 }
