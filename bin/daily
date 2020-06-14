@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/sh 
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
 // Heroku
 // /bin/sh
@@ -69,6 +69,14 @@ const new_yorker_recipe = "New Yorker Magazine.recipe"
 const economist_file = "_economist_"
 const economist_recipe = "The Economist.recipe"
 
+//Wired
+const wired_file = "_wired_"
+const wired_recipe = "wired.recipe"
+
+//Atlantic
+const atlantic_file = "_atlantic_"
+const atlantic_recipe = "atlantic.recipe"
+
 function get_file(pub){
     if(pub === "WSJ") return WSJ_file;
     if(pub === "ST") return seattle_times_file;
@@ -76,6 +84,8 @@ function get_file(pub){
     if(pub === "NYT") return nytimes_file;
     if(pub === "NYR") return new_yorker_file;
     if(pub === "EC") return economist_file;
+    if(pub === "WR") return wired_file;
+    if(pub === "AL") return atlantic_file;
 }
 
 function get_recipe(pub){
@@ -85,24 +95,20 @@ function get_recipe(pub){
     if(pub === "NYT") return nytimes_recipe;
     if(pub === "NYR") return new_yorker_recipe;
     if(pub === "EC") return economist_recipe;
+    if(pub === "WR") return wired_recipe;
+    if(pub === "AL") return atlantic_recipe;
 }
 
 function get_username(pub){
     if(pub === "WSJ") return `${process.env.wsj_username}`;
-    if(pub === "ST") return "";
-    if(pub === "RD") return "";
     if(pub === "NYT") return `${process.env.nyt_username}`;
-    if(pub === "NYR") return "";
-    if(pub === "EC") return "";
+    else return "";
 }
 
 function get_password(pub){
     if(pub === "WSJ") return `${process.env.wsj_password}`;
-    if(pub === "ST") return "";
-    if(pub === "RD") return "";
     if(pub === "NYT") return `${process.env.nyt_password}`;
-    if(pub === "NYR") return "";
-    if(pub === "EC") return "";
+    else return "";
 }
 
 function download_pub(pub, filetype, output_profile, callback){
@@ -186,4 +192,6 @@ else{
   daily("NYT");
   daily("NYR");
   daily("EC");
+  daily("WR");
+  daily("AL");
 }
