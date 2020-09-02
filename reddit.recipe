@@ -15,6 +15,8 @@ class AdvancedUserRecipe1577732911(BasicNewsRecipe):
         ('todoist comments', 'https://www.reddit.com/r/todoist/comments.rss'),
         ('remarkable', 'https://www.reddit.com/r/RemarkableTablet/.rss'),
         ('remarkable comments', 'https://www.reddit.com/r/RemarkableTablet/comments.rss'),
+        ('entrepreneur', 'https://www.reddit.com/r/entrepreneur/.rss'),
+        ('entrepreneur comments', 'https://www.reddit.com/r/entrepreneur/comments.rss'),
     ]
 
     def parse_feeds(self):
