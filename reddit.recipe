@@ -17,6 +17,7 @@ class AdvancedUserRecipe1577732911(BasicNewsRecipe):
         ('remarkable comments', 'https://www.reddit.com/r/RemarkableTablet/comments.rss'),
         ('entrepreneur', 'https://www.reddit.com/r/entrepreneur/.rss'),
         ('entrepreneur comments', 'https://www.reddit.com/r/entrepreneur/comments.rss'),
+        ('product hunt', 'https://www.producthunt.com/feed?category=undefined'),
     ]
 
     def parse_feeds(self):
