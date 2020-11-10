@@ -26,15 +26,15 @@ class AdvancedUserRecipe1577732911(BasicNewsRecipe):
 
         # Loop through all feeds.
         for feed in feeds:
-		feed_title = feed.title.upper()
-		# Find the comments feed
-		if feed_title.find('COMMENTS') >= 0:
-			for f in feeds:
-				# Find the corresponding non-comments feed
-				if f.title.upper() == feed_title.partition(' ')[0]:
-					# Combine the articles into the current comments feed
-					feed.articles = feed.articles + f.articles 
-					feed.articles.sort(key=lambda a: a.date)
-					feeds.remove(f)
+            feed_title = feed.title.upper()
+            # Find the comments feed
+            if feed_title.find('COMMENTS') >= 0:
+                for f in feeds:
+                    # Find the corresponding non-comments feed
+                    if f.title.upper() == feed_title.partition(' ')[0]:
+                        # Combine the articles into the current comments feed
+                        feed.articles = feed.articles + f.articles 
+                        feed.articles.sort(key=lambda a: a.date)
+                        feeds.remove(f)
         return feeds
 
