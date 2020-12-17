@@ -56,7 +56,6 @@ os.execCommand(`calibre-customize -a EpubSplit.zip`, function (returnvalue) {
 });
 
 const slugRemove = /[$\[\]*_+~.,/()'"!\-—:@]/g;
-const slugRemove2 = /[$\[\]*_+~.,/()'"!\-—@]/g;
 
 let transporter = nodemailer.createTransport({
     host: 'mail.gmx.com',

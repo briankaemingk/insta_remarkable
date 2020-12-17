@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /usr/local/bin/node
 ":" //# comment; exec /app/.heroku/node/bin/node --noharmony "$0" "$@"
 // Heroku
 // /bin/sh
@@ -7,6 +7,10 @@
 // PC
 // /usr/bin/node
 require('dotenv').config();
+
+var convert = require('ebook-convert');
+
+
 const exec = require('child_process').exec
 var fs = require('fs');
 const dropboxV2Api = require('dropbox-v2-api');
@@ -27,7 +31,6 @@ fs.writeFile(".rmapi", "devicetoken: " + process.env.devicetoken + "\n" +
 });
 
 function os_func() {
-
 
         this.execCommand = function(pub, cmd, callback) {
             exec(cmd, (error, stdout, stderr) => {
@@ -55,7 +58,7 @@ const seattle_times_recipe = "The Seattle Times.recipe";
 
 //NYT
 const nytimes_file = "_nytimes_";
-const nytimes_recipe = "The New York Times.recipe";
+const nytimes_recipe = "nytimes.recipe";
 
 //Reddit
 const reddit_file = "_reddit_"
@@ -109,21 +112,38 @@ function get_password(pub){
     if(pub === "WSJ") return `${process.env.wsj_password}`;
     if(pub === "NYT") return `${process.env.nyt_password}`;
     else return "";
-}
+} 
 
 function download_pub(pub, filetype, output_profile, callback){
-        const command = `ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype} -vv --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`;
-        console.log(command);
+    var options = {
+        input: `"${get_recipe(pub)}"`,
+        output: `"./pdfs/${get_file(pub)}.${filetype}"`,
+        username: `"${get_username(pub)}"`,
+        password: `"${get_password(pub)}"`,
+        "output-profile": `"${output_profile}"`,
+      }
+
+        convert(options, function (err) {
+            if (err) console.log(err)
+          else{
+            //   console.log(`ebook-convert successful ./pdfs/${get_file(pub)}.${filetype}`)
+                callback(`./pdfs/${get_file(pub)}.${filetype}`);
+                }
+        })
+
+
+        // const command = `ebook-convert "${get_recipe(pub)}" ./pdfs/${get_file(pub)}.${filetype} -vv --output-profile ${output_profile} --username ${get_username(pub)} --password ${get_password(pub)}`;
+        // console.log(command);
     
-        os.execCommand(pub, command, function (returnvalue) {
-                if(returnvalue.includes(`exec error`)){
-                    console.log(`Initial ${pub} pub download failed, trying again`);
-                    download_pub(pub);
-                }
-                else{
-                    callback(`./pdfs/${get_file(pub)}.${filetype}`);
-                }
-        });
+        // os.execCommand(pub, command, function (returnvalue) {
+        //         if(returnvalue.includes(`exec error`)){
+        //             console.log(`Initial ${pub} pub download failed, trying again`);
+        //             download_pub(pub);
+        //         }
+        //         else{
+        //             callback(`./pdfs/${get_file(pub)}.${filetype}`);
+        //         }
+        //  });
 }
 
 function daily(pub) {
