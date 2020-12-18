@@ -117,7 +117,7 @@ app.get('/', function (req, res) {
                         index = page.articles.findIndex(x => x.title === article.title);
                         index = index + 3;
 
-                        os.execCommand(`calibre-debug --run-plugin EpubSplit -- -title="article.title" -o ./pdfs/${file}.epub ./pdfs/instapaper_all.epub ${index}`, function (returnvalue) {
+                        os.execCommand(`calibre-debug --run-plugin EpubSplit -- -title="${file}" -o ./pdfs/${file}.epub ./pdfs/instapaper_all.epub ${index}`, function (returnvalue) {
                             file = `${slugify(article.title, {replacement: '-', remove: slugRemove, lower: true})}`;
                             filename = `${file}.pdf`;
                             filepath = `./pdfs/${filename}`;
@@ -216,7 +216,7 @@ app.post('/send', function (req, res) {
                 os.execCommand(`ebook-convert ./pdfs/sent-${name} ./pdfs/${name_no_path}_all.epub --output-profile tablet --sr1-search '<div class="calibre_navbar">(.|\n)*?</div>' --sr2-search 'This article was downloaded by(.|/n)*</a>'`, function (returnvalue) {
                     console.log(`Converted to master epub`);
 
-                    os.execCommand(`calibre-debug --run-plugin EpubSplit -- -title="article.title" -o ./pdfs/${name_no_path}.epub  ./pdfs/${name_no_path}_all.epub 1`, function (returnvalue) {
+                    os.execCommand(`calibre-debug --run-plugin EpubSplit -- -title="${file}" -o ./pdfs/${name_no_path}.epub  ./pdfs/${name_no_path}_all.epub 1`, function (returnvalue) {
                         os.execCommand(`./rmapi put  ./pdfs/${name_no_path}.epub`, function (returnvalue) {
                             console.log(`${name_no_path} uploaded to rM`);
 
